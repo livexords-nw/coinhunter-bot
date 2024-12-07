@@ -1,0 +1,7 @@
+{
+  "daily": true,
+  "wheel": true,
+  "farm": true,
+  "mission": true,
+  "upgrade": true
+}
