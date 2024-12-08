@@ -2,6 +2,10 @@
   "daily": true,
   "wheel": true,
   "farm": true,
+  "upgrade": true,
   "mission": true,
-  "upgrade": true
+  "tasks": true,
+  "chest": true,
+  "delay_pergantian_akun": 10,
+  "delay_loop": 3000
 }

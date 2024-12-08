@@ -24,6 +24,13 @@ class coinhunter:
         "telegram-bot": "GAME",
         "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0" 
     }
+    
+    ARROW_MAP = {
+        "r": "➡️",  
+        "t": "⬆️",  
+        "b": "⬇️",  
+        "l": "⬅️"   
+    }
 
     def __init__(self):
         self.query_list = self.load_query("query.txt")
@@ -204,7 +211,7 @@ class coinhunter:
                             else:
                                 self.log(f"Upgrade gagal: {upgrade_data.get('message')}", Fore.RED)
                         else:
-                            self.log(f"Upgrade gagal untuk: {item['iconName']}, Status: {upgrade_response.status_code}", Fore.RED)
+                            self.log(f"Upgrade gagal untuk: {item['iconName']}, Status: {upgrade_response.status_code}, pesan: {upgrade_response.json().get("errorCode", None)}", Fore.RED)
                     else:
                         self.log(f"Saldo tidak cukup untuk upgrade {item['iconName']} ke level {item['level'] + 1} ({self.coin} < {upgrade_cost})", Fore.RED)
                     time.sleep(3)
@@ -303,7 +310,7 @@ class coinhunter:
                 self.log(f"Succes mengclaim daily : {data}", Fore.GREEN)
 
         except requests.exceptions.RequestException as e:
-            self.log(f"Daily sudah terclaim", Fore.RED)
+            self.log(f"Daily sudah terclaim, pesan: {response.json().get("errorCode", None)}", Fore.RED)
         except ValueError as e:
             self.log(f"Data error: {e}", Fore.RED)
         except Exception as e:
@@ -391,7 +398,7 @@ class coinhunter:
                             self.log(f"Berhasil mengirim ke region: {selected_map}", Fore.GREEN)
                             break
                         else:
-                            self.log(f"Pengiriman gagal untuk region {selected_map}, status: {farm_response.status_code}", Fore.RED)
+                            self.log(f"Pengiriman gagal untuk region {selected_map}, status: {farm_response.status_code}, pesan: {farm_response.json().get("errorCode", None)}", Fore.RED)
                     except Exception as e:
                         self.log(f"Unexpected error while sending region {selected_map}: {e}", Fore.RED)
                     
@@ -491,12 +498,12 @@ class coinhunter:
                             if check_response.status_code == 200:
                                 check_data = check_response.json()
                                 if check_data.get("ok") and "result" in check_data:
-                                    self.log(f"Status mission {mission_name} diperiksa: {check_data['result']}", Fore.GREEN)
+                                    self.log(f"Status mission {mission_name} diperiksa: {check_data['result']['completed']}", Fore.GREEN)
                                 else:
                                     self.log(f"Status mission {mission_name} tidak ditemukan atau data tidak valid.", Fore.RED)
 
                             else:
-                                self.log(f"Gagal memeriksa status mission {mission_name}, status: {check_response.status_code}", Fore.RED)
+                                self.log(f"Gagal memeriksa status mission {mission_name}, status: {check_response.status_code}, pesan: {check_response.json().get("errorCode", None)}", Fore.RED)
                         else:
                             self.log(f"Pengiriman gagal untuk mission {mission_name}, status: {farm_response.status_code}", Fore.RED)
                     except Exception as e:
@@ -510,6 +517,137 @@ class coinhunter:
             self.log(f"Data error: {e}", Fore.RED)
         except Exception as e:
             self.log(f"Unexpected error: {e}", Fore.RED)
+            
+    def tasks(self) -> None:
+        req_url = f"{self.BASE_URL}tasks"
+        headers = {**self.HEADERS, "telegram-data": self.token}
+        
+        try:
+            response = requests.get(req_url, headers=headers)
+            response.raise_for_status()  
+            
+            data = response.json()
+
+            if data.get("ok") and "result" in data:
+                missions = data["result"]
+
+                customer_name = [mission["customer"] for mission in missions]
+                self.log(f"Daftar tasks names: {customer_name}", Fore.YELLOW)
+                for customer_name in customer_name:
+                        claim_check_url = f"{req_url}/check"
+                        payload = {"customer": customer_name}
+                        check_response = requests.post(claim_check_url, headers=headers, json=payload)
+                        
+                        if check_response.status_code == 200:
+                            check_data = check_response.json()
+                            if check_data.get("ok") and "result" in check_data:
+                                self.log(f"Status task {customer_name} | {check_data['result']['status']}", Fore.GREEN)
+                            else:
+                                self.log(f"Status task {customer_name} tidak ditemukan atau data tidak valid.", Fore.RED)
+
+                        else:
+                            self.log(f"Gagal memeriksa status task {customer_name}, status: {check_response.status_code}, pesan: {check_response.json().get("errorCode", None)}", Fore.RED)
+            else:
+                self.log("Data tidak valid atau kosong.", Fore.RED)
+            
+        except requests.exceptions.RequestException as e:
+            self.log(f"Request failed: {e}", Fore.RED)
+        except ValueError as e:
+            self.log(f"Data error: {e}", Fore.RED)
+        except Exception as e:
+            self.log(f"Unexpected error: {e}", Fore.RED)
+
+    def chest(self):
+        req_url = f"{self.BASE_URL}chest/validate"
+        headers = {**self.HEADERS, "telegram-data": self.token}
+        kemungkinan_arah = ["r", "t", "b", "l"]
+        kode_saat_ini = random.sample(kemungkinan_arah, len(kemungkinan_arah))
+        percobaan = 1
+
+        while True:
+            payload = {"code": kode_saat_ini}
+            ikon_kode = " ".join(self.ARROW_MAP[k] for k in kode_saat_ini)
+
+            self.log(f"Percobaan {percobaan}: Mengirim kode {ikon_kode}", Fore.BLUE)
+
+            try:
+                response = requests.post(req_url, headers=headers, json=payload)
+                response.raise_for_status()
+
+                data = response.json()
+                hasil = data.get("result", {}).get("code", [])
+
+                if all(hasil):
+                    self.log(f"Berhasil! Semua kombinasi benar: {ikon_kode}", Fore.GREEN)
+                    claim_url = f"{self.BASE_URL}chest/open"
+                    claim_res = requests.post(claim_url, headers=headers)
+                    if claim_res.status_code == 200:
+                        try:
+                            check_data = claim_res.json()
+                            if check_data.get("ok") and "result" in check_data:
+                                item_name = check_data["result"].get("item", "Item tidak dikenal")
+                                self.log(f"Berhasil membuka chest! Item yang diperoleh: {item_name}", Fore.GREEN)
+                            else:
+                                self.log(
+                                    f"Data tidak valid atau chest tidak ditemukan. Periksa kembali respons server.",
+                                    Fore.RED
+                                )
+                        except ValueError:
+                            self.log(f"Gagal memproses respons JSON dari server.", Fore.RED)
+                    else:
+                        try:
+                            error_message = claim_res.json().get("errorCode", "Kesalahan tidak diketahui")
+                        except ValueError:
+                            error_message = "Respons server tidak dapat diproses."
+
+                        self.log(
+                            f"Gagal memeriksa status chest. Status HTTP: {claim_res.status_code}, Pesan: {error_message}",
+                            Fore.RED
+                        )
+                    break
+                else:
+                    self.log(f"Kombinasi salah: {ikon_kode}", Fore.RED)
+
+                    for i, res in enumerate(hasil):
+                        if not res:
+                            kode_saat_ini[i] = random.choice(kemungkinan_arah)
+
+            except requests.exceptions.RequestException as e:
+                self.log(f"Kamu sudah mengbuka kunci chestnya", Fore.RED)
+                claim_url = f"{self.BASE_URL}chest/open"
+                claim_res = requests.post(claim_url, headers=headers)
+                if claim_res.status_code == 200:
+                    try:
+                        check_data = claim_res.json()
+                        if check_data.get("ok") and "result" in check_data:
+                            item_name = check_data["result"].get("item", "Item tidak dikenal")
+                            self.log(f"Berhasil membuka chest! Item yang diperoleh: {item_name}", Fore.GREEN)
+                        else:
+                            self.log(
+                                f"Data tidak valid atau chest tidak ditemukan. Periksa kembali respons server.",
+                                Fore.RED
+                            )
+                    except ValueError:
+                        self.log(f"Gagal memproses respons JSON dari server.", Fore.RED)
+                else:
+                    try:
+                        error_message = claim_res.json().get("errorCode", "Kesalahan tidak diketahui")
+                    except ValueError:
+                        error_message = "Respons server tidak dapat diproses."
+
+                    self.log(
+                        f"Gagal memeriksa status chest. Status HTTP: {claim_res.status_code}, Pesan: {error_message}",
+                        Fore.RED
+                    )
+                break
+            except ValueError as e:
+                self.log(f"Kesalahan data: {e}", Fore.RED)
+                break
+            except Exception as e:
+                self.log(f"Kesalahan tidak terduga: {e}", Fore.RED)
+                break
+            
+            percobaan += 1
 
 if __name__ == "__main__":
     chunter = coinhunter()
@@ -551,12 +689,24 @@ if __name__ == "__main__":
         else:
             chunter.log(f"{Fore.RED}[CONFIG] mission: False{Fore.RESET},")
         
+        if config.get("tasks", False):
+            chunter.log(f"{Fore.YELLOW}[CONFIG] tasks: True{Fore.RESET},")
+            chunter.tasks()
+        else:
+            chunter.log(f"{Fore.RED}[CONFIG] tasks: False{Fore.RESET},")
+        
+        if config.get("chest", False):
+            chunter.log(f"{Fore.YELLOW}[CONFIG] chest: True{Fore.RESET},")
+            chunter.chest()
+        else:
+            chunter.log(f"{Fore.RED}[CONFIG] chest: False{Fore.RESET},")
+        
         if index == max_index - 1:
-            chunter.log(f"{Fore.CYAN}berhenti untuk loop selanjutnya{Fore.RESET},")
-            chunter.log(f"{Fore.CYAN}tidur selama 3 jam{Fore.RESET},")
-            time.sleep(300000)
+            chunter.log(f"Berhenti untuk loop selanjutnya{Fore.CYAN},")
+            chunter.log(f"Tidur selama {config.get("delay_loop")} detik{Fore.CYAN},")
+            time.sleep(config.get("delay_loop"))
             index = 0
         else:
+            chunter.log(f"Tidur selama {config.get("delay_pergantian_akun")} detik ,sebelum melanjutkan ke akun berikutnya")
+            time.sleep(config.get("delay_pergantian_akun"))
             index += 1
-
-    
