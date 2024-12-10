@@ -236,33 +236,23 @@ class coinhunter:
     
     def burn(self, id: str, name: str) -> None:
         req_url = f"{self.BASE_URL}backpack/burn"
-        burn_info_url = f"{self.BASE_URL}backpack/burn-info"
 
         headers = {**self.HEADERS, "telegram-data": self.token}
         payload = {"itemId": id}
 
         try:
-            response = requests.get(burn_info_url, headers=headers)
+            response = requests.post(req_url, headers=headers, json=payload)
             response.raise_for_status()
 
-            burn_data = response.json().get("result")
-            if not burn_data:
-                self.log("Data 'result' tidak ditemukan dalam respons burn-info.", Fore.RED)
-                return
-
-            if burn_data.get("count") != 3:
-                response = requests.post(req_url, headers=headers, json=payload)
-                response.raise_for_status()
-
-                result = response.json().get("ok")
-                if result:
-                    self.log(f"Berhasil mengupgrade hunter dengan item {name}", Fore.GREEN)
-                    self.info()
-                else:
-                    self.log(f"Gagal mengupgrade hunter dengan item {name}", Fore.RED)
+            result = response.json().get("ok")
+            if result:
+                self.log(f"Berhasil mengupgrade hunter dengan item {name}", Fore.GREEN)
+                self.info()
+            else:
+                self.log(f"Gagal mengupgrade hunter dengan item {name}", Fore.RED)
 
         except requests.exceptions.RequestException as e:
-            self.log(f"Request failed: {e}", Fore.RED)
+            self.log(f"Request failed | {response.json().get("errorCode", None)}", Fore.RED)
         except ValueError as e:
             self.log(f"Data error: {e}", Fore.RED)
         except Exception as e:
@@ -328,7 +318,7 @@ class coinhunter:
             self.map()
 
         except requests.exceptions.RequestException as e:
-            self.log(f"Farm sudah terclaim", Fore.RED)
+            self.log(f"Farm sudah terclaim , pesan: {response.json().get("errorCode", None)}", Fore.RED)
             self.map()
         except ValueError as e:
             self.log(f"Data error: {e}", Fore.RED)
@@ -648,6 +638,29 @@ class coinhunter:
                 break
             
             percobaan += 1
+    
+    def reff(self) -> None:
+        req_url = f"{self.BASE_URL}referrals/claim"
+
+        headers = {**self.HEADERS, "telegram-data": self.token}
+        
+        try:
+            response = requests.post(req_url, headers=headers)
+            response.raise_for_status()  
+            
+            data = response.json().get("result")
+            if not data:
+                raise ValueError("Data 'result' tidak ditemukan dalam respons.")
+
+            self.log(f"Berhasil mengclaim point reff..", Fore.GREEN)
+            self.info()
+            
+        except requests.exceptions.RequestException as e:
+            self.log(f"Request failed | {response.json().get("errorCode", None)}", Fore.RED)
+        except ValueError as e:
+            self.log(f"Data error: {e}", Fore.RED)
+        except Exception as e:
+            self.log(f"Unexpected error: {e}", Fore.RED)
 
 if __name__ == "__main__":
     chunter = coinhunter()
@@ -700,6 +713,12 @@ if __name__ == "__main__":
             chunter.chest()
         else:
             chunter.log(f"{Fore.RED}[CONFIG] chest: False{Fore.RESET},")
+        
+        if config.get("reff", False):
+            chunter.log(f"{Fore.YELLOW}[CONFIG] reff: True{Fore.RESET},")
+            chunter.reff()
+        else:
+            chunter.log(f"{Fore.RED}[CONFIG] reff: False{Fore.RESET},")
         
         if index == max_index - 1:
             chunter.log(f"Berhenti untuk loop selanjutnya{Fore.CYAN},")

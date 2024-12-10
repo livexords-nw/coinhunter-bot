@@ -2,7 +2,6 @@
 <h1 align="center">Coin Hunter Bot</h1>
 
 <p align="center">Automasi tugas pada Coin Hunter untuk meningkatkan efisiensi dan hasil Anda!</p>
-
 ---
 
 ## 🚀 **Tentang Bot**
@@ -21,17 +20,16 @@ Dengan bot ini, Anda dapat menghemat waktu sekaligus memaksimalkan hasil tanpa p
 
 ---
 
-## 🌟 **Versi v1.2.1**
+## 🌟 **Versi v1.3.2**
 
 ### **Pembaruan pada Versi Ini**:
 
-1. **Peningkatan Performa**: Logger kini lebih rinci untuk mempermudah pemantauan proses.
-2. **Fitur Baru**: Penambahan kemampuan auto-solve dan klaim peti, otomatisasi tugas, serta pengaturan tambahan di `config.json`.
-3. **Tidak Ada Fitur yang Dihapus**: Semua fitur dari versi sebelumnya tetap tersedia.
+1. Pembenahan BUG pada saat menjalankan burn
+2. Penambahan fitur claim reff
 
 ---
 
-### **Fitur dalam Versi 1.2.1**:
+### **Fitur dalam Versi 1.3.2**:
 
 1. **Auto Farming**: Mengklaim hasil farming secara otomatis.
 2. **Auto Spin Wheel**: Memutar Spin Wheel tanpa interaksi manual.
@@ -40,10 +38,12 @@ Dengan bot ini, Anda dapat menghemat waktu sekaligus memaksimalkan hasil tanpa p
 5. **Auto Upgrade**: Melakukan upgrade item untuk hasil lebih maksimal.
 6. **Auto Tasks**: Menyelesaikan tugas harian secara otomatis.
 7. **Auto Chest**: Memecahkan puzzle peti dan klaim secara otomatis.
+8. **Auto-claim-reff**: Mengclaim reff point secara otomatis
 
 ### **Rencana Pengembangan Selanjutnya (Coming Soon)**:
 
-1. **Efisiensi Bot yang Lebih Tinggi**: Peningkatan kecepatan dan penghematan sumber daya.
+1. Craft otomatis
+2. Pencarian resource secara otomatis
 
 ---
 
@@ -70,6 +70,7 @@ Mulai gunakan Coin Hunter dengan mendaftar melalui tautan berikut:
 | `upgrade`               | Upgrade level item otomatis               | `True`      |
 | `tasks`                 | Menyelesaikan tugas otomatis              | `True`      |
 | `chest`                 | Memecahkan puzzle peti dan klaim otomatis | `True`      |
+| `reff`                  | Mengclaim point reff secara otomatis      | `True`      |
 | `delay_pergantian_akun` | Delay saat akan berganti akun             | `10`        |
 | `delay_loop`            | Delay saat akan melakukan looping kembali | `3000`      |
 
@@ -119,6 +120,7 @@ Mulai gunakan Coin Hunter dengan mendaftar melalui tautan berikut:
 - **Auto Upgrade**: Peningkatan level item secara otomatis.
 - **Auto Tasks**: Penyelesaian tugas harian secara otomatis.
 - **Auto Chest**: Memecahkan puzzle peti dan klaim otomatis.
+- **Auto claim reff**: Mengclaim point reff secara otomatis.
 
 ---
 

@@ -6,6 +6,7 @@
   "mission": true,
   "tasks": true,
   "chest": true,
+  "reff": true,
   "delay_pergantian_akun": 10,
   "delay_loop": 3000
 }
