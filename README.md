@@ -2,6 +2,7 @@
 <h1 align="center">Coin Hunter Bot</h1>
 
 <p align="center">Automasi tugas pada Coin Hunter untuk meningkatkan efisiensi dan hasil Anda!</p>
+
 ---
 
 ## 🚀 **Tentang Bot**
