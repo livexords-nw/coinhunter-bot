@@ -1,3 +1,4 @@
+from collections import deque
 from datetime import datetime
 import json
 import random
@@ -25,6 +26,24 @@ class coinhunter:
         "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0" 
     }
     
+    MAP = [
+            {"name": "training-camp", "neighbors": ["survivor-camp","haystack-field"], "items": ["pizza-slice", "meat", "zoombie-blood"]},
+            {"name": "survivor-camp", "neighbors": ["supply-barn"], "items": ["pizza-slice", "leather", "zombie-blood"]},
+            {"name": "haystack-field", "neighbors": ["supply-barn"], "items": ["lucky-clever", "rope", "zombie-tooth", "plastic-bottle"]},
+            {"name": "supply-barn", "neighbors": ["survivor-camp", "fuel-depot", "haystack-field"], "items": ["meat", "hammer", "zombie-blood"]},
+            {"name": "fuel-depot", "neighbors": ["supply-barn", "checkpoint-charlie", "bulldozer-yard", "muddy-patch"], "items": ["food-can", "gasoline", "plastic-bottle"]},
+            {"name": "checkpoint-charlie", "neighbors": ["fuel-depot", "robbed-truck", "muddy-patch", ], "items": ["food-can", "lucky-clever", "microchip", "zombie-tooth"]},
+            {"name": "bulldozer-yard", "neighbors": ["fuel-depot", "muddy-patch", "ruined-house"], "items": ["lucky-clever", "wrench", "screw", "zombie-tooth"]},
+            {"name": "muddy-patch", "neighbors": ["swampy-ground", "fuel-depot", "bulldozer-yard", "checkpoint-charlie"], "items": ["lucky-clever", "wood"]},
+            {"name": "robbed-truck", "neighbors": ["checkpoint-charlie", "water-plant"], "items": ["food-can", "lucky-clever", "dirty-textile", "zombie-tooth"]},
+            {"name": "ruined-house", "neighbors": ["sos-shelter", "bulldozer-yard"], "items": ["food-can", "pizza-slice", "rubber", "plastic-bottle"]},
+            {"name": "sos-shelter", "neighbors": ["ruined-house", "wrecked-house"], "items": ["food-can", "pizza-slice", "lucky-clever", "glass"]},
+            {"name": "wrecked-house", "neighbors": ["swampy-ground", "sos-shelter", "abandoned-checkpoint"], "items": ["food-can", "plastic-bottle", "super-glue", "dirty-textile"]},
+            {"name": "swampy-ground", "neighbors": ["abandoned-checkpoint", "wrecked-house", "muddy-patch"], "items": ["swamp-oyster", "chemicals", "zombie-blood"]},
+            {"name": "water-plant", "neighbors": ["robbed-truck"], "items": ["food-can", "bolt", "zombie-blood"]},
+            {"name": "abandoned-checkpoint", "neighbors": ["swampy-ground", "wrecked-house"], "items": ["food-can", "copper-wire", "zombie-tooth"]},
+        ]
+    
     ARROW_MAP = {
         "r": "➡️",  
         "t": "⬆️",  
@@ -39,6 +58,9 @@ class coinhunter:
         self.ticket = 0
         self.power = 0
         self.config = self.load_config()
+        self.result = None
+        self.is_crafting_material = None
+        self.location = None
 
     def banner(self):
             print("     Coinhunters Free Bot")
@@ -91,6 +113,7 @@ class coinhunter:
             self.coin = data.get('coins', 0)
             self.ticket = data.get('tickets', 0)
             self.power = data.get('power', 0)
+            self.location = data.get('currentRegion', None)
 
         except IndexError as e:
             self.log(f"Error: {e}", Fore.RED)
@@ -143,7 +166,6 @@ class coinhunter:
         upgrade_url = f"{self.BASE_URL}backpack/upgrade"
 
         headers = {**self.HEADERS, "telegram-data": self.token}
-
         success = True 
 
         while success:
@@ -171,11 +193,18 @@ class coinhunter:
                     self.log(f"- Name: {item['iconName']}, Level: {item['level']}, Type: {item['type']}", Fore.GREEN)
 
                 for item in items:
+                    req_item = self.craft(info=False)                    
+                    if not req_item:
+                        if item["level"] < 8:
+                            self.log(f"Item {item['iconName']} tidak sesuai untuk crafting, upgrade ke level 8 sebelum burn.", Fore.CYAN)
+                            self.upgrade_to_level_8(item, headers, upgrade_url, upgrade_prices)
+                        self.burn(id=item.get("id"), name=item.get("iconName"))
+                        continue
+
                     if item["level"] >= 8:
                         self.log(f"Item {item['iconName']} telah mencapai level maksimum: {item['level']}", Fore.CYAN)
-                        self.burn(id=item.get("id"),name=item.get("iconName"))
                         continue
-                    
+
                     level_prices = upgrade_prices.get(str(item["level"] + 1))
                     if not level_prices:
                         self.log(f"Tidak ada data harga untuk level {item['level']} pada item {item['iconName']}", Fore.RED)
@@ -210,10 +239,13 @@ class coinhunter:
                                 success = True 
                             else:
                                 self.log(f"Upgrade gagal: {upgrade_data.get('message')}", Fore.RED)
+                                success = False
                         else:
-                            self.log(f"Upgrade gagal untuk: {item['iconName']}, Status: {upgrade_response.status_code}, pesan: {upgrade_response.json().get("errorCode", None)}", Fore.RED)
+                            self.log(f"Upgrade gagal untuk: {item['iconName']}, Status: {upgrade_response.status_code}, pesan: {upgrade_response.json().get('errorCode', None)}", Fore.RED)
+                            success = True
                     else:
                         self.log(f"Saldo tidak cukup untuk upgrade {item['iconName']} ke level {item['level'] + 1} ({self.coin} < {upgrade_cost})", Fore.RED)
+                        success = False
                     time.sleep(3)
 
             except requests.exceptions.RequestException as e:
@@ -225,15 +257,51 @@ class coinhunter:
                 break
 
             except Exception as e:
-                self.log(f"Unexpected error: {e}", Fore.RED)
+                self.log(f"Upgrade | Unexpected error: {e}", Fore.RED)
                 break
-            
+
             time.sleep(5)
 
             if not success:
                 self.log("Tidak ada item yang berhasil di-upgrade dalam iterasi ini.", Fore.RED)
                 break
-    
+
+    def upgrade_to_level_8(self, item, headers, upgrade_url, upgrade_prices):
+        while item["level"] < 8:
+            level_prices = upgrade_prices.get(str(item["level"] + 1))
+            if not level_prices:
+                break
+
+            type_data = level_prices.get(item["type"].lower())
+            if not type_data:
+                break
+
+            upgrade_cost = type_data["price"]
+            if self.coin < upgrade_cost:
+                self.log(f"Saldo tidak cukup untuk upgrade {item['iconName']} ke level {item['level'] + 1}", Fore.RED)
+                break
+
+            payload = {"itemId": item["id"], "useUpgradeScroll": False}
+            upgrade_response = requests.post(upgrade_url, json=payload, headers=headers)
+
+            if upgrade_response.status_code == 200:
+                upgrade_data = upgrade_response.json()
+                if upgrade_data.get("ok"):
+                    item["level"] = upgrade_data["result"]["item"]["level"]
+                    self.log(f"Upgrade berhasil untuk {item['iconName']} ke level {item['level']}", Fore.GREEN)
+                else:
+                    self.log(f"Upgrade gagal: {upgrade_data.get('message')}", Fore.RED)
+                    break
+            elif upgrade_response.status_code == 400:  # Handle error status 400 specifically
+                self.log(f"Upgrade gagal untuk: {item['iconName']}, Status: {upgrade_response.status_code}", Fore.RED)
+                self.log("Tunggu sebentar sebelum mencoba lagi...", Fore.YELLOW)
+                time.sleep(5)  # Wait before retrying
+            else:
+                self.log(f"Upgrade gagal untuk: {item['iconName']}, Status: {upgrade_response.status_code}", Fore.RED)
+                break
+
+            time.sleep(3)
+
     def burn(self, id: str, name: str) -> None:
         req_url = f"{self.BASE_URL}backpack/burn"
 
@@ -256,7 +324,7 @@ class coinhunter:
         except ValueError as e:
             self.log(f"Data error: {e}", Fore.RED)
         except Exception as e:
-            self.log(f"Unexpected error: {e}", Fore.RED)
+            self.log(f"Burn | Unexpected error: {e}", Fore.RED)
 
     def wheel(self) -> None:
         req_url = f"{self.BASE_URL}wheel/roll"
@@ -279,7 +347,7 @@ class coinhunter:
             except ValueError as e:
                 self.log(f"Data error: {e}", Fore.RED)
             except Exception as e:
-                self.log(f"Unexpected error: {e}", Fore.RED)
+                self.log(f"Wheel | Unexpected error: {e}", Fore.RED)
             
             self.dataCoin()
 
@@ -304,7 +372,7 @@ class coinhunter:
         except ValueError as e:
             self.log(f"Data error: {e}", Fore.RED)
         except Exception as e:
-            self.log(f"Unexpected error: {e}", Fore.RED)
+            self.log(f"Daily | Unexpected error: {e}", Fore.RED)
 
     def farm(self) -> None:
         req_url = f"{self.BASE_URL}farm/claim"
@@ -323,89 +391,171 @@ class coinhunter:
         except ValueError as e:
             self.log(f"Data error: {e}", Fore.RED)
         except Exception as e:
-            self.log(f"Unexpected error: {e}", Fore.RED)
+            self.log(f"Farm | Unexpected error: {e}", Fore.RED)
+
+    def build_graph(self, data):
+        graph = {}
+        items = {}
+        for item in data:
+            graph[item["name"]] = item["neighbors"]
+            items[item["name"]] = item["items"]
+        return graph, items
+
+    def find_closest_item(self, graph, items, start_name, target_item):
+        queue = deque([(start_name, [start_name])])
+        visited = set()
+
+        while queue:
+            current, path = queue.popleft()
+            if current in visited:
+                continue
+            visited.add(current)
+
+            if target_item in items[current]:
+                return current, path
+
+            for neighbor in graph[current]:
+                if neighbor not in visited:
+                    queue.append((neighbor, path + [neighbor]))
+
+        return None, []
 
     def map(self):
-        """Mengambil nama-nama map, memvalidasi hunters, dan mengirim region ke API."""
+        """Mengatur alur untuk mencari material, memvalidasi lokasi, dan memulai farming."""
 
-        req_url = f"{self.BASE_URL}map"
+        # Panggil fungsi craft untuk mendapatkan daftar item yang dibutuhkan
+        craft_data = self.craft(info=True)
+        if not craft_data:
+            self.log("Data craft tidak valid atau kosong.", Fore.RED)
+            return
+
+        required_items = [item["iconName"] for item in craft_data]
+        self.log(f"Item yang dibutuhkan: {required_items}", Fore.YELLOW)
+
+        # Cek keberadaan item di backpack satu per satu
+        backpack_items = []
+        for required_item in required_items:
+            backpack_item = self.check_backpack(required_item)  # Pastikan ini mengirim nama item untuk pengecekan
+            if not backpack_item:
+                self.log(f"Item '{required_item}' tidak ditemukan di backpack.", Fore.RED)
+                backpack_items.append(required_item)  # Menyimpan item yang tidak ada di backpack
+            else:
+                self.log(f"Item '{required_item}' ditemukan di backpack.", Fore.GREEN)
+
+        # Jika tidak ada item yang perlu dicari, hentikan proses
+        if not backpack_items:
+            self.log("Semua item sudah ada di backpack.", Fore.GREEN)
+            return
+
+        # Pertimbangkan jarak lokasi item-item yang belum ada di backpack
+        graph, items = self.build_graph(self.MAP)
+
+        # Mencari lokasi terdekat untuk item yang belum ada di backpack
+        closest_item = None
+        shortest_distance = float('inf')  # Set jarak terpendek dengan nilai tak terhingga
+
+        for target_item in backpack_items:
+            location, path = self.find_closest_item(graph, items, self.location, target_item)
+            if location:
+                distance = len(path)  # Misalkan panjang path adalah jarak, bisa disesuaikan dengan logika lainnya
+                if distance < shortest_distance:
+                    closest_item = target_item
+                    shortest_distance = distance
+
+        if closest_item:
+            # Setelah mendapatkan item yang paling dekat, kirimkan permintaan untuk item tersebut
+            self.log(f"Mencari item '{closest_item}' yang belum ada di backpack...", Fore.YELLOW)
+            location, path = self.find_closest_item(graph, items, self.location, closest_item)
+
+            if location:
+                self.log(f"Item '{closest_item}' ditemukan di lokasi '{location}' dengan jalur: {path}", Fore.GREEN)
+
+                # Jika lokasi saat ini memiliki item, langsung mulai farming
+                if location == self.location:
+                    self.start_farming(location)
+                else:
+                    # Pindah ke lokasi berikutnya dari path dan mulai farming
+                    next_location = path[1] if len(path) > 1 else location
+                    self.log(f"Berpindah ke lokasi '{next_location}' untuk mencari item '{closest_item}'.", Fore.YELLOW)
+                    self.start_farming(next_location)
+
+        else:
+            self.log(f"Tidak ada item yang ditemukan di peta.", Fore.RED)
+
+
+    def start_farming(self, location):
+        """Mengirim permintaan untuk memulai farming di lokasi tertentu."""
+        farm_url = f"{self.BASE_URL}farm/start"
+        headers = {**self.HEADERS, "telegram-data": self.token}
+        payload = {"region": location}
+
+        try:
+            farm_response = requests.post(farm_url, json=payload, headers=headers)
+            if farm_response.status_code == 200:
+                self.log(f"Farming berhasil dimulai di lokasi '{location}'.", Fore.GREEN)
+            else:
+                self.log(f"Farming gagal di lokasi '{location}', status: {farm_response.status_code}, pesan: {farm_response.json().get('errorCode', None)}", Fore.RED)
+        except requests.exceptions.RequestException as e:
+            self.log(f"Request error saat memulai farming: {e}", Fore.RED)
+        except Exception as e:
+            self.log(f"Unexpected error saat memulai farming: {e}", Fore.RED)
+
+    def check_backpack(self, item_name):
+        """Memeriksa apakah item ada di dalam backpack."""
+        backpack_url = f"{self.BASE_URL}backpack"
+        headers = {**self.HEADERS, "telegram-data": self.token}
+
+        try:
+            backpack_response = requests.get(backpack_url, headers=headers)
+            backpack_response.raise_for_status()
+            backpack_data = backpack_response.json()
+
+            if backpack_data.get("ok"):
+                items_in_backpack = backpack_data.get("result", [])
+                for item in items_in_backpack:
+                    if item.get("name") == item_name:
+                        return True
+                return False  
+            else:
+                self.log(f"Failed to retrieve backpack items: {backpack_data.get('error', 'Unknown error')}", Fore.RED)
+                return False
+
+        except requests.exceptions.RequestException as e:
+            self.log(f"Backpack request failed: {e}", Fore.RED)
+            return False
+
+    def craft(self, info=True):
+        req_url = f"{self.BASE_URL}craft/CRAFT_ITEMS"
         headers = {**self.HEADERS, "telegram-data": self.token}
 
         try:
             response = requests.get(req_url, headers=headers)
             response.raise_for_status()
+
             data = response.json()
+            if not data.get("ok"):
+                raise ValueError("Response indicates failure: 'ok' field is False.")
 
-            if not data.get("ok") or "result" not in data:
-                self.log("Data tidak valid atau kosong.", Fore.RED)
-                return
+            result = data.get("result")
+            if not result:
+                raise ValueError("Data 'result' tidak ditemukan dalam respons.")
 
-            map_names = [item["name"] for item in data["result"]]
-            self.log(f"Maps ditemukan: {map_names}", Fore.YELLOW)
-
-            valid_maps = []
-            for map_name in map_names:
-                try:
-                    map_detail_url = f"{req_url}/{map_name}"
-                    map_response = requests.get(map_detail_url, headers=headers)
-                    map_response.raise_for_status()
-                    map_data = map_response.json()
-
-
-                    if not map_data.get("ok"):
-                        self.log(f"Status 'ok' tidak ditemukan atau False untuk map {map_name}.", Fore.RED)
-                        continue
-                    if "result" not in map_data:
-                        self.log(f"'result' tidak ditemukan dalam data map {map_name}.", Fore.RED)
-                        continue
-
-                    hunters = map_data["result"].get("hunters", 0)
-
-                    if hunters < self.power:
-                        valid_maps.append(map_name)
-
-                except requests.exceptions.RequestException as req_err:
-                    self.log(f"Request error untuk map {map_name}: {req_err}", Fore.RED)
-                except KeyError as key_err:
-                    self.log(f"Key error untuk map {map_name}: {key_err}", Fore.RED)
-                except ValueError as val_err:
-                    self.log(f"Value error untuk map {map_name}: {val_err}", Fore.RED)
-                except Exception as e:
-                    self.log(f"Unexpected error untuk map {map_name}: {e}", Fore.RED)
-
-            if valid_maps:
-                attempts = 0
-                total_maps = len(valid_maps)
-                
-                while attempts < total_maps:
-                    selected_map = random.choice(valid_maps)
-                    farm_url = f"{self.BASE_URL}farm/start"
-                    payload = {"region": selected_map}
-
-                    try:
-                        farm_response = requests.post(farm_url, json=payload, headers=headers)
-                        if farm_response.status_code == 200:
-                            self.log(f"Berhasil mengirim ke region: {selected_map}", Fore.GREEN)
-                            break
-                        else:
-                            self.log(f"Pengiriman gagal untuk region {selected_map}, status: {farm_response.status_code}, pesan: {farm_response.json().get("errorCode", None)}", Fore.RED)
-                    except Exception as e:
-                        self.log(f"Unexpected error while sending region {selected_map}: {e}", Fore.RED)
-                    
-                    attempts += 1
-                
-                if attempts == total_maps:
-                    self.log("Farm sudah dimulai, telah mencoba semua map.", Fore.YELLOW)
-
-            else:
-                self.log("Tidak ada map yang memenuhi kriteria.", Fore.YELLOW)
+            for item in result:
+                if item['level'] < 8:
+                    if info:
+                        self.log(f"Hasil crafting '{item['name']}' memiliki level {item['level']}. Upgrade ke level 8 diperlukan.", Fore.YELLOW)
+                    return item['items']
+                else:
+                    if info:
+                        self.log(f"Hasil crafting '{item['name']}' sudah memenuhi syarat (Level {item['level']}).", Fore.GREEN)
+                    return item
 
         except requests.exceptions.RequestException as e:
             self.log(f"Request failed: {e}", Fore.RED)
         except ValueError as e:
             self.log(f"Data error: {e}", Fore.RED)
         except Exception as e:
-            self.log(f"Unexpected error: {e}", Fore.RED)
+            self.log(f"Craft | Unexpected error: {e}", Fore.RED)
 
     def info(self) -> None:
         req_url = f"{self.BASE_URL}user"
@@ -432,7 +582,7 @@ class coinhunter:
         except ValueError as e:
             self.log(f"Data error: {e}", Fore.RED)
         except Exception as e:
-            self.log(f"Unexpected error: {e}", Fore.RED)
+            self.log(f"Info | Unexpected error: {e}", Fore.RED)
 
     def dataCoin(self) -> None:
         req_url = f"{self.BASE_URL}user"
@@ -455,7 +605,7 @@ class coinhunter:
         except ValueError as e:
             self.log(f"Data error: {e}", Fore.RED)
         except Exception as e:
-            self.log(f"Unexpected error: {e}", Fore.RED)
+            self.log(f"Data | Unexpected error: {e}", Fore.RED)
 
     def mission(self) -> None:
         req_url = f"{self.BASE_URL}missions"
@@ -506,7 +656,7 @@ class coinhunter:
         except ValueError as e:
             self.log(f"Data error: {e}", Fore.RED)
         except Exception as e:
-            self.log(f"Unexpected error: {e}", Fore.RED)
+            self.log(f"Mission | Unexpected error: {e}", Fore.RED)
             
     def tasks(self) -> None:
         req_url = f"{self.BASE_URL}tasks"
@@ -545,7 +695,7 @@ class coinhunter:
         except ValueError as e:
             self.log(f"Data error: {e}", Fore.RED)
         except Exception as e:
-            self.log(f"Unexpected error: {e}", Fore.RED)
+            self.log(f"Tasks | Unexpected error: {e}", Fore.RED)
 
     def chest(self):
         req_url = f"{self.BASE_URL}chest/validate"
@@ -660,7 +810,7 @@ class coinhunter:
         except ValueError as e:
             self.log(f"Data error: {e}", Fore.RED)
         except Exception as e:
-            self.log(f"Unexpected error: {e}", Fore.RED)
+            self.log(f"Reff | Unexpected error: {e}", Fore.RED)
 
 if __name__ == "__main__":
     chunter = coinhunter()

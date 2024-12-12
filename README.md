@@ -20,16 +20,16 @@ Dengan bot ini, Anda dapat menghemat waktu sekaligus memaksimalkan hasil tanpa p
 
 ---
 
-## 🌟 **Versi v1.3.2**
+## 🌟 **Versi v1.4.3**
 
 ### **Pembaruan pada Versi Ini**:
 
-1. Pembenahan BUG pada saat menjalankan burn
-2. Penambahan fitur claim reff
+1. Penambahan sistem mencari item untuk di craft (sementara untuk versi ini hanya bisa mencari di craftingan clothes/baju)
+2. Pengoptimalan pada semua fungsi
 
 ---
 
-### **Fitur dalam Versi 1.3.2**:
+### **Fitur dalam Versi 1.4.3**:
 
 1. **Auto Farming**: Mengklaim hasil farming secara otomatis.
 2. **Auto Spin Wheel**: Memutar Spin Wheel tanpa interaksi manual.
@@ -43,7 +43,6 @@ Dengan bot ini, Anda dapat menghemat waktu sekaligus memaksimalkan hasil tanpa p
 ### **Rencana Pengembangan Selanjutnya (Coming Soon)**:
 
 1. Craft otomatis
-2. Pencarian resource secara otomatis
 
 ---
 
