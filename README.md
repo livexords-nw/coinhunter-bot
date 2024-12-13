@@ -29,7 +29,7 @@ Dengan bot ini, Anda dapat menghemat waktu sekaligus memaksimalkan hasil tanpa p
 
 ---
 
-### **Fitur dalam Versi 1.4.3**:
+### **Fitur dalam Versi 1.4.4**:
 
 1. **Auto Farming**: Mengklaim hasil farming secara otomatis.
 2. **Auto Spin Wheel**: Memutar Spin Wheel tanpa interaksi manual.
