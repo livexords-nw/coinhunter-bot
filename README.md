@@ -2,7 +2,6 @@
 <h1 align="center">Coin Hunter Bot</h1>
 
 <p align="center">Automasi tugas pada Coin Hunter untuk meningkatkan efisiensi dan hasil Anda!</p>
-
 ---
 
 ## 🚀 **Tentang Bot**
@@ -21,12 +20,12 @@ Dengan bot ini, Anda dapat menghemat waktu sekaligus memaksimalkan hasil tanpa p
 
 ---
 
-## 🌟 **Versi v1.4.3**
+## 🌟 **Versi v1.4.4**
 
 ### **Pembaruan pada Versi Ini**:
 
-1. Penambahan sistem mencari item untuk di craft (sementara untuk versi ini hanya bisa mencari di craftingan clothes/baju)
-2. Pengoptimalan pada semua fungsi
+1. Membenahi BUG upgrade, mencari item, burn item
+2. Pengoptimalan alur
 
 ---
 

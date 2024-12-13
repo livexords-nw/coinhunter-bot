@@ -162,16 +162,18 @@ class coinhunter:
             self.log(f"Data error: {e}", Fore.RED)
 
     def upgrade(self) -> None:
+        """Mengelola item di backpack dengan pengecekan crafting, upgrade, dan burn."""
         req_url = f"{self.BASE_URL}backpack"
         upgrade_url = f"{self.BASE_URL}backpack/upgrade"
 
         headers = {**self.HEADERS, "telegram-data": self.token}
-        success = True 
+        success = True
 
         while success:
             success = False
 
             try:
+                # Refresh backpack data
                 response = requests.get(req_url, headers=headers)
                 response.raise_for_status()
                 data = response.json()
@@ -179,92 +181,80 @@ class coinhunter:
                 if not data or "result" not in data:
                     raise ValueError("Data 'result' tidak ditemukan dalam respons.")
 
-                items = [{"id": item.get("id"), "iconName": item.get("iconName"), "level": item.get("level"), "type": item.get("type")}
-                        for item in data.get("result", [])]
+                items = [
+                    {
+                        "id": item.get("id"),
+                        "iconName": item.get("iconName"),
+                        "level": item.get("level"),
+                        "type": item.get("type"),
+                    }
+                    for item in data.get("result", [])
+                ]
 
                 if not items:
-                    self.log("Tidak ada data 'id' dan 'iconName' yang ditemukan.", Fore.RED)
+                    self.log("Tidak ada item di backpack.", Fore.RED)
                     break
-
+                
                 upgrade_prices = self.get_upgrade_prices()
 
-                self.log("Item yang ditemukan:", Fore.YELLOW)
+                # Dapatkan item yang dibutuhkan untuk crafting
+                required_items = self.craft(info=False)
+                required_counts = {item["iconName"]: 0 for item in required_items}
+
+                # Hitung jumlah item yang diperlukan
                 for item in items:
-                    self.log(f"- Name: {item['iconName']}, Level: {item['level']}, Type: {item['type']}", Fore.GREEN)
+                    if item["iconName"] in required_counts:
+                        required_counts[item["iconName"]] += 1
 
                 for item in items:
-                    req_item = self.craft(info=False)                    
-                    if not req_item:
-                        if item["level"] < 8:
-                            self.log(f"Item {item['iconName']} tidak sesuai untuk crafting, upgrade ke level 8 sebelum burn.", Fore.CYAN)
-                            self.upgrade_to_level_8(item, headers, upgrade_url, upgrade_prices)
-                        self.burn(id=item.get("id"), name=item.get("iconName"))
-                        continue
-
-                    if item["level"] >= 8:
-                        self.log(f"Item {item['iconName']} telah mencapai level maksimum: {item['level']}", Fore.CYAN)
-                        continue
-
-                    level_prices = upgrade_prices.get(str(item["level"] + 1))
-                    if not level_prices:
-                        self.log(f"Tidak ada data harga untuk level {item['level']} pada item {item['iconName']}", Fore.RED)
-                        continue
-
-                    type_data = level_prices.get(item["type"].lower())
-                    if not type_data:
-                        self.log(f"Tidak ada data harga untuk tipe {item['type']} pada item {item['iconName']}", Fore.RED)
-                        continue
-
-                    upgrade_cost = type_data["price"]
-                    self.log(f"Harga upgrade untuk {item['iconName']} ke level {item['level'] + 1} adalah: {upgrade_cost}", Fore.YELLOW)
-                    self.dataCoin()
-
-                    if self.coin >= upgrade_cost:
-                        payload = {"itemId": item["id"], "useUpgradeScroll": False}
-                        upgrade_response = requests.post(upgrade_url, json=payload, headers=headers)
-
-                        if upgrade_response.status_code == 200:
-                            upgrade_data = upgrade_response.json()
-                            if upgrade_data.get("ok"):
-                                user_power = upgrade_data["result"]["user"]["power"]
-                                user_level = upgrade_data["result"]["user"]["level"]
-                                item_power = upgrade_data["result"]["item"]["power"]
-                                item_level = upgrade_data["result"]["item"]["level"]
-                                name = upgrade_data["result"]["item"]["iconName"]
-
-                                self.log(f"Upgrade berhasil untuk: {name}", Fore.GREEN)
-                                self.log(f" - User Power: {user_power}, User Level: {user_level}", Fore.LIGHTMAGENTA_EX)
-                                self.log(f" - Item Power: {item_power}, Item Level: {item_level}", Fore.LIGHTMAGENTA_EX)
-
-                                success = True 
-                            else:
-                                self.log(f"Upgrade gagal: {upgrade_data.get('message')}", Fore.RED)
-                                success = False
+                    if item["iconName"] in required_counts:
+                        if required_counts[item["iconName"]] > 1:
+                            self.log(f"Item '{item['iconName']}' melebihi jumlah yang dibutuhkan, akan di-burn.", Fore.YELLOW)
+                            self.burn(id=item["id"], name=item["iconName"])
+                            required_counts[item["iconName"]] -= 1
                         else:
-                            self.log(f"Upgrade gagal untuk: {item['iconName']}, Status: {upgrade_response.status_code}, pesan: {upgrade_response.json().get('errorCode', None)}", Fore.RED)
-                            success = True
-                    else:
-                        self.log(f"Saldo tidak cukup untuk upgrade {item['iconName']} ke level {item['level'] + 1} ({self.coin} < {upgrade_cost})", Fore.RED)
-                        success = False
-                    time.sleep(3)
+                            self.log(f"Item '{item['iconName']}' diperlukan untuk crafting, tidak akan di-upgrade atau di-burn.", Fore.GREEN)
+                        continue
+
+                    # Jika item tidak dibutuhkan untuk crafting
+                    if item["level"] < 8:
+                        self.log(f"Item '{item['iconName']}' akan di-upgrade ke level 8.", Fore.CYAN)
+                        self.upgrade_to_level_8(item, headers, upgrade_url, upgrade_prices)
+                        self.burn(id=item["id"], name=item["iconName"])
+                    elif item["level"] >= 8:
+                        self.log(f"Item '{item['iconName']}' sudah level 8, akan di-burn.", Fore.YELLOW)
+                        self.burn(id=item["id"], name=item["iconName"])
+
+                    # Refresh backpack data setelah setiap operasi
+                    response = requests.get(req_url, headers=headers)
+                    response.raise_for_status()
+                    data = response.json()
+                    items = [
+                        {
+                            "id": item.get("id"),
+                            "iconName": item.get("iconName"),
+                            "level": item.get("level"),
+                            "type": item.get("type"),
+                        }
+                        for item in data.get("result", [])
+                    ]
 
             except requests.exceptions.RequestException as e:
-                self.log(f"Request failed: {e}", Fore.RED)
+                self.log(f"Request gagal: {e}", Fore.RED)
                 break
 
             except ValueError as e:
-                self.log(f"Data error: {e}", Fore.RED)
+                self.log(f"Kesalahan data: {e}", Fore.RED)
                 break
 
             except Exception as e:
-                self.log(f"Upgrade | Unexpected error: {e}", Fore.RED)
+                self.log(f"Upgrade | Kesalahan tidak terduga: {e}", Fore.RED)
                 break
 
             time.sleep(5)
 
-            if not success:
-                self.log("Tidak ada item yang berhasil di-upgrade dalam iterasi ini.", Fore.RED)
-                break
+        self.log("Proses upgrade selesai.", Fore.GREEN)
+
 
     def upgrade_to_level_8(self, item, headers, upgrade_url, upgrade_prices):
         while item["level"] < 8:
@@ -292,10 +282,10 @@ class coinhunter:
                 else:
                     self.log(f"Upgrade gagal: {upgrade_data.get('message')}", Fore.RED)
                     break
-            elif upgrade_response.status_code == 400:  # Handle error status 400 specifically
+            elif upgrade_response.status_code == 400:
                 self.log(f"Upgrade gagal untuk: {item['iconName']}, Status: {upgrade_response.status_code}", Fore.RED)
                 self.log("Tunggu sebentar sebelum mencoba lagi...", Fore.YELLOW)
-                time.sleep(5)  # Wait before retrying
+                time.sleep(5) 
             else:
                 self.log(f"Upgrade gagal untuk: {item['iconName']}, Status: {upgrade_response.status_code}", Fore.RED)
                 break
@@ -513,7 +503,7 @@ class coinhunter:
             if backpack_data.get("ok"):
                 items_in_backpack = backpack_data.get("result", [])
                 for item in items_in_backpack:
-                    if item.get("name") == item_name:
+                    if item.get("iconName") == item_name:
                         return True
                 return False  
             else:
@@ -869,6 +859,12 @@ if __name__ == "__main__":
             chunter.reff()
         else:
             chunter.log(f"{Fore.RED}[CONFIG] reff: False{Fore.RESET},")
+        
+        if config.get("upgrade", False):
+            chunter.log(f"{Fore.YELLOW}[CONFIG] upgrade: True{Fore.RESET},")
+            chunter.upgrade()
+        else:
+            chunter.log(f"{Fore.RED}[CONFIG] upgrade: False{Fore.RESET},")
         
         if index == max_index - 1:
             chunter.log(f"Berhenti untuk loop selanjutnya{Fore.CYAN},")
