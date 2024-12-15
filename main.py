@@ -173,7 +173,6 @@ class coinhunter:
             success = False
 
             try:
-                # Refresh backpack data
                 response = requests.get(req_url, headers=headers)
                 response.raise_for_status()
                 data = response.json()
@@ -197,11 +196,9 @@ class coinhunter:
                 
                 upgrade_prices = self.get_upgrade_prices()
 
-                # Dapatkan item yang dibutuhkan untuk crafting
                 required_items = self.craft(info=False)
                 required_counts = {item["iconName"]: 0 for item in required_items}
 
-                # Hitung jumlah item yang diperlukan
                 for item in items:
                     if item["iconName"] in required_counts:
                         required_counts[item["iconName"]] += 1
@@ -216,7 +213,6 @@ class coinhunter:
                             self.log(f"Item '{item['iconName']}' diperlukan untuk crafting, tidak akan di-upgrade atau di-burn.", Fore.GREEN)
                         continue
 
-                    # Jika item tidak dibutuhkan untuk crafting
                     if item["level"] < 8:
                         self.log(f"Item '{item['iconName']}' akan di-upgrade ke level 8.", Fore.CYAN)
                         self.upgrade_to_level_8(item, headers, upgrade_url, upgrade_prices)
@@ -225,7 +221,6 @@ class coinhunter:
                         self.log(f"Item '{item['iconName']}' sudah level 8, akan di-burn.", Fore.YELLOW)
                         self.burn(id=item["id"], name=item["iconName"])
 
-                    # Refresh backpack data setelah setiap operasi
                     response = requests.get(req_url, headers=headers)
                     response.raise_for_status()
                     data = response.json()
@@ -413,7 +408,6 @@ class coinhunter:
     def map(self):
         """Mengatur alur untuk mencari material, memvalidasi lokasi, dan memulai farming."""
 
-        # Panggil fungsi craft untuk mendapatkan daftar item yang dibutuhkan
         craft_data = self.craft(info=True)
         if not craft_data:
             self.log("Data craft tidak valid atau kosong.", Fore.RED)
@@ -422,49 +416,42 @@ class coinhunter:
         required_items = [item["iconName"] for item in craft_data]
         self.log(f"Item yang dibutuhkan: {required_items}", Fore.YELLOW)
 
-        # Cek keberadaan item di backpack satu per satu
         backpack_items = []
         for required_item in required_items:
-            backpack_item = self.check_backpack(required_item)  # Pastikan ini mengirim nama item untuk pengecekan
+            backpack_item = self.check_backpack(required_item) 
             if not backpack_item:
                 self.log(f"Item '{required_item}' tidak ditemukan di backpack.", Fore.RED)
-                backpack_items.append(required_item)  # Menyimpan item yang tidak ada di backpack
+                backpack_items.append(required_item) 
             else:
                 self.log(f"Item '{required_item}' ditemukan di backpack.", Fore.GREEN)
 
-        # Jika tidak ada item yang perlu dicari, hentikan proses
         if not backpack_items:
             self.log("Semua item sudah ada di backpack.", Fore.GREEN)
             return
 
-        # Pertimbangkan jarak lokasi item-item yang belum ada di backpack
         graph, items = self.build_graph(self.MAP)
 
-        # Mencari lokasi terdekat untuk item yang belum ada di backpack
         closest_item = None
-        shortest_distance = float('inf')  # Set jarak terpendek dengan nilai tak terhingga
+        shortest_distance = float('inf') 
 
         for target_item in backpack_items:
             location, path = self.find_closest_item(graph, items, self.location, target_item)
             if location:
-                distance = len(path)  # Misalkan panjang path adalah jarak, bisa disesuaikan dengan logika lainnya
+                distance = len(path) 
                 if distance < shortest_distance:
                     closest_item = target_item
                     shortest_distance = distance
 
         if closest_item:
-            # Setelah mendapatkan item yang paling dekat, kirimkan permintaan untuk item tersebut
             self.log(f"Mencari item '{closest_item}' yang belum ada di backpack...", Fore.YELLOW)
             location, path = self.find_closest_item(graph, items, self.location, closest_item)
 
             if location:
                 self.log(f"Item '{closest_item}' ditemukan di lokasi '{location}' dengan jalur: {path}", Fore.GREEN)
 
-                # Jika lokasi saat ini memiliki item, langsung mulai farming
                 if location == self.location:
                     self.start_farming(location)
                 else:
-                    # Pindah ke lokasi berikutnya dari path dan mulai farming
                     next_location = path[1] if len(path) > 1 else location
                     self.log(f"Berpindah ke lokasi '{next_location}' untuk mencari item '{closest_item}'.", Fore.YELLOW)
                     self.start_farming(next_location)
@@ -709,32 +696,62 @@ class coinhunter:
 
                 if all(hasil):
                     self.log(f"Berhasil! Semua kombinasi benar: {ikon_kode}", Fore.GREEN)
-                    claim_url = f"{self.BASE_URL}chest/open"
-                    claim_res = requests.post(claim_url, headers=headers)
-                    if claim_res.status_code == 200:
+                    info_url = f"{self.BASE_URL}chest"
+                    info_res = requests.get(info_url, headers=headers)
+                    if info_res.status_code == 200:
                         try:
-                            check_data = claim_res.json()
-                            if check_data.get("ok") and "result" in check_data:
-                                item_name = check_data["result"].get("item", "Item tidak dikenal")
-                                self.log(f"Berhasil membuka chest! Item yang diperoleh: {item_name}", Fore.GREEN)
-                            else:
-                                self.log(
-                                    f"Data tidak valid atau chest tidak ditemukan. Periksa kembali respons server.",
-                                    Fore.RED
-                                )
+                            info_data = info_res.json()
+                            if info_data.get("ok") and "result" in info_data:
+                                craft_items = self.craft(info=False)
+                                
+                                prizes = info_data["result"]["info"]["prizes"]
+                                    
+                                if craft_items:
+                                    for prize in prizes:
+                                        icon_name = prize["iconName"]
+                                        chance = prize["chance"]
+ 
+                                        matching_items = [item for item in craft_items if item["iconName"] == icon_name]
+
+                                        if matching_items:
+                                            if chance < 50:
+                                                self.log(f"Item '{icon_name}' memiliki peluang rendah ({chance}%).", Fore.RED)
+                                            else:
+                                                self.log(f"Item '{icon_name}' memiliki peluang tinggi ({chance}%), chest akan di claim.", Fore.GREEN)
+                                                claim_url = f"{self.BASE_URL}chest/open"
+                                                claim_res = requests.post(claim_url, headers=headers)
+                                                if claim_res.status_code == 200:
+                                                    try:
+                                                        check_data = claim_res.json()
+                                                        if check_data.get("ok") and "result" in check_data:
+                                                            item_name = check_data["result"].get("item", "Item tidak dikenal")
+                                                            self.log(f"Berhasil membuka chest! Item yang diperoleh: {item_name}", Fore.GREEN)
+                                                        else:
+                                                            self.log(
+                                                                f"Data tidak valid atau chest tidak ditemukan. Periksa kembali respons server.",
+                                                                Fore.RED
+                                                            )
+                                                    except ValueError:
+                                                        self.log(f"Gagal memproses respons JSON dari server.", Fore.RED)
+                                                else:
+                                                    try:
+                                                        error_message = claim_res.json().get("errorCode", "Kesalahan tidak diketahui")
+                                                    except ValueError:
+                                                        error_message = "Respons server tidak dapat diproses."
+
+                                                    self.log(
+                                                        f"Gagal memeriksa status chest. Status HTTP: {claim_res.status_code}, Pesan: {error_message}",
+                                                        Fore.RED
+                                                    )
+                                                break
+                                        else:
+                                            self.log(f"Item '{icon_name}' tidak dibutuhkan dalam crafting.", Fore.YELLOW)
+                                else:
+                                    self.log("Data crafting gagal diambil atau kosong.", Fore.RED)
                         except ValueError:
                             self.log(f"Gagal memproses respons JSON dari server.", Fore.RED)
                     else:
-                        try:
-                            error_message = claim_res.json().get("errorCode", "Kesalahan tidak diketahui")
-                        except ValueError:
-                            error_message = "Respons server tidak dapat diproses."
-
-                        self.log(
-                            f"Gagal memeriksa status chest. Status HTTP: {claim_res.status_code}, Pesan: {error_message}",
-                            Fore.RED
-                        )
-                    break
+                        self.log("Data crafting gagal diambil atau kosong.", Fore.RED)
                 else:
                     self.log(f"Kombinasi salah: {ikon_kode}", Fore.RED)
 
@@ -743,32 +760,63 @@ class coinhunter:
                             kode_saat_ini[i] = random.choice(kemungkinan_arah)
 
             except requests.exceptions.RequestException as e:
-                self.log(f"Kamu sudah mengbuka kunci chestnya", Fore.RED)
-                claim_url = f"{self.BASE_URL}chest/open"
-                claim_res = requests.post(claim_url, headers=headers)
-                if claim_res.status_code == 200:
+                self.log(f"Kamu sudah mengbuka kunci chestnya, chest akan dibuka", Fore.RED)
+                info_url = f"{self.BASE_URL}chest"
+                info_res = requests.get(info_url, headers=headers)
+                if info_res.status_code == 200:
                     try:
-                        check_data = claim_res.json()
-                        if check_data.get("ok") and "result" in check_data:
-                            item_name = check_data["result"].get("item", "Item tidak dikenal")
-                            self.log(f"Berhasil membuka chest! Item yang diperoleh: {item_name}", Fore.GREEN)
-                        else:
-                            self.log(
-                                f"Data tidak valid atau chest tidak ditemukan. Periksa kembali respons server.",
-                                Fore.RED
-                            )
+                        info_data = info_res.json()
+                        if info_data.get("ok") and "result" in info_data:
+                            craft_items = self.craft(info=False)
+                            
+                            prizes = info_data["result"]["info"]["prizes"]
+                            
+                            if craft_items:
+                                for prize in prizes:
+                                    icon_name = prize["iconName"]
+                                    chance = prize["chance"]
+
+                                    matching_items = [item for item in craft_items if item["iconName"] == icon_name]
+
+                                    if matching_items:
+                                        if chance < 50:
+                                            self.log(f"Item '{icon_name}' memiliki peluang rendah ({chance}%).", Fore.RED)
+                                        else:
+                                            self.log(f"Item '{icon_name}' memiliki peluang tinggi ({chance}%), chest akan di claim.", Fore.GREEN)
+                                            claim_url = f"{self.BASE_URL}chest/open"
+                                            claim_res = requests.post(claim_url, headers=headers)
+                                            if claim_res.status_code == 200:
+                                                try:
+                                                    check_data = claim_res.json()
+                                                    if check_data.get("ok") and "result" in check_data:
+                                                        item_name = check_data["result"].get("item", "Item tidak dikenal")
+                                                        self.log(f"Berhasil membuka chest! Item yang diperoleh: {item_name}", Fore.GREEN)
+                                                    else:
+                                                        self.log(
+                                                            f"Data tidak valid atau chest tidak ditemukan. Periksa kembali respons server.",
+                                                            Fore.RED
+                                                        )
+                                                except ValueError:
+                                                    self.log(f"Gagal memproses respons JSON dari server.", Fore.RED)
+                                            else:
+                                                try:
+                                                    error_message = claim_res.json().get("errorCode", "Kesalahan tidak diketahui")
+                                                except ValueError:
+                                                    error_message = "Respons server tidak dapat diproses."
+
+                                                self.log(
+                                                    f"Gagal memeriksa status chest. Status HTTP: {claim_res.status_code}, Pesan: {error_message}",
+                                                    Fore.RED
+                                                )
+                                            break
+                                    else:
+                                        self.log(f"Item '{icon_name}' tidak dibutuhkan dalam crafting.", Fore.YELLOW)
+                            else:
+                                self.log("Data crafting gagal diambil atau kosong.", Fore.RED)
                     except ValueError:
                         self.log(f"Gagal memproses respons JSON dari server.", Fore.RED)
                 else:
-                    try:
-                        error_message = claim_res.json().get("errorCode", "Kesalahan tidak diketahui")
-                    except ValueError:
-                        error_message = "Respons server tidak dapat diproses."
-
-                    self.log(
-                        f"Gagal memeriksa status chest. Status HTTP: {claim_res.status_code}, Pesan: {error_message}",
-                        Fore.RED
-                    )
+                    self.log("Data crafting gagal diambil atau kosong.", Fore.RED)
                 break
             except ValueError as e:
                 self.log(f"Kesalahan data: {e}", Fore.RED)

@@ -20,16 +20,15 @@ Dengan bot ini, Anda dapat menghemat waktu sekaligus memaksimalkan hasil tanpa p
 
 ---
 
-## 🌟 **Versi v1.4.4**
+## 🌟 **Versi v1.5.4**
 
 ### **Pembaruan pada Versi Ini**:
 
-1. Membenahi BUG upgrade, mencari item, burn item
-2. Pengoptimalan alur
+1. Sekarang chest akan dipilah isinya apakah item dari chest dibutuhkan untuk crafting atau tidak
 
 ---
 
-### **Fitur dalam Versi 1.4.4**:
+### **Fitur dalam Versi 1.5.4**:
 
 1. **Auto Farming**: Mengklaim hasil farming secara otomatis.
 2. **Auto Spin Wheel**: Memutar Spin Wheel tanpa interaksi manual.
