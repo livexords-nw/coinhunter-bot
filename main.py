@@ -193,7 +193,7 @@ class coinhunter:
                 if not items:
                     self.log("Tidak ada item di backpack.", Fore.RED)
                     break
-                
+
                 upgrade_prices = self.get_upgrade_prices()
 
                 required_items = self.craft(info=False)
@@ -204,67 +204,69 @@ class coinhunter:
                         required_counts[item["iconName"]] += 1
 
                 for item in items:
-                    if item["iconName"] in required_counts:
-                        needed_count = sum(1 for req_item in required_items if req_item["iconName"] == item["iconName"])
+                    needed_count = sum(1 for req_item in required_items if req_item["iconName"] == item["iconName"])
 
-                        while required_counts[item["iconName"]] > needed_count:
-                            if item["level"] < 8:
-                                self.log(f"Item '{item['iconName']}' akan di-upgrade ke level 8 sebelum di-burn.", Fore.CYAN)
-                                self.upgrade_to_level_8(item, headers, upgrade_url, upgrade_prices)
-                            else:
-                                self.log(f"Item '{item['iconName']}' melebihi jumlah yang dibutuhkan, akan di-burn.", Fore.YELLOW)
-                                self.burn(id=item["id"], name=item["iconName"])
-                                required_counts[item["iconName"]] -= 1
+                    if item["iconName"] in required_counts and required_counts[item["iconName"]] <= needed_count:
+                        self.log(f"Item '{item['iconName']}' diperlukan untuk crafting, tidak akan di-burn atau di-upgrade.", Fore.GREEN)
+                        continue
 
-                        if required_counts[item["iconName"]] <= needed_count:
-                            self.log(f"Item '{item['iconName']}' diperlukan untuk crafting, tidak akan di-upgrade atau di-burn.", Fore.GREEN)
+                    excess_count = required_counts[item["iconName"]] - needed_count
 
-                            all_items_available = all(
-                                required_counts.get(req_item["iconName"], 0) >= 
-                                sum(1 for item in required_items if item["iconName"] == req_item["iconName"])
-                                for req_item in required_items
-                            )
+                    if excess_count > 0:
+                        if item["level"] < 8:
+                            self.log(f"Item '{item['iconName']}' akan di-upgrade ke level 8 karena melebihi kebutuhan.", Fore.CYAN)
+                            self.upgrade_to_level_8(item, headers, upgrade_url, upgrade_prices)
 
-                            if all_items_available:
-                                self.log("Semua item yang dibutuhkan untuk crafting tersedia. Meng-upgrade item ke level 8...", Fore.BLUE)
-
-                                for upgrade_item in items:
-                                    if upgrade_item["iconName"] in required_counts and upgrade_item["level"] < 8:
-                                        self.upgrade_to_level_8(upgrade_item, headers, upgrade_url, upgrade_prices)
-                                
-                                while True:
-                                    post_response = requests.post(f"{self.BASE_URL}craft/CRAFT_ITEMS/{self.name_craft}", headers=headers)
-                                    if post_response.status_code == 200:
-                                        self.log(f"Mengupgrade {self.name_craft} berhasil.", Fore.GREEN)
-                                        break
-                                    elif post_response.status_code == 400:
-                                        error_code = post_response.json().get("errorCode", None)
-                                        self.log(f"Mengupgrade {self.name_craft} gagal dengan pesan: {error_code}. Mengulangi...", Fore.RED)
-                                        time.sleep(3)
-                                    else:
-                                        post_response.raise_for_status()
-                                return
-
-                    if item["level"] < 8:
-                        self.log(f"Item '{item['iconName']}' akan di-upgrade ke level 8.", Fore.CYAN)
-                        self.upgrade_to_level_8(item, headers, upgrade_url, upgrade_prices)
+                        self.log(f"Item '{item['iconName']}' akan di-burn karena melebihi kebutuhan.", Fore.YELLOW)
                         self.burn(id=item["id"], name=item["iconName"])
-                    elif item["level"] >= 8:
-                        self.log(f"Item '{item['iconName']}' sudah level 8, akan di-burn.", Fore.YELLOW)
+                        required_counts[item["iconName"]] -= 1
+
+                    elif item["iconName"] not in required_counts:
+                        if item["level"] < 8:
+                            self.log(f"Item '{item['iconName']}' tidak dibutuhkan untuk crafting. Akan di-upgrade ke level 8.", Fore.CYAN)
+                            self.upgrade_to_level_8(item, headers, upgrade_url, upgrade_prices)
+
+                        self.log(f"Item '{item['iconName']}' tidak dibutuhkan untuk crafting. Akan di-burn.", Fore.YELLOW)
                         self.burn(id=item["id"], name=item["iconName"])
 
-                    response = requests.get(req_url, headers=headers)
-                    response.raise_for_status()
-                    data = response.json()
-                    items = [
-                        {
-                            "id": item.get("id"),
-                            "iconName": item.get("iconName"),
-                            "level": item.get("level"),
-                            "type": item.get("type"),
-                        }
-                        for item in data.get("result", [])
-                    ]
+                all_items_available = all(
+                    required_counts.get(req_item["iconName"], 0) >= 
+                    sum(1 for item in required_items if item["iconName"] == req_item["iconName"])
+                    for req_item in required_items
+                )
+
+                if all_items_available:
+                    self.log("Semua item yang dibutuhkan untuk crafting tersedia. Meng-upgrade item ke level 8...", Fore.BLUE)
+
+                    for upgrade_item in items:
+                        if upgrade_item["iconName"] in required_counts and upgrade_item["level"] < 8:
+                            self.upgrade_to_level_8(upgrade_item, headers, upgrade_url, upgrade_prices)
+
+                    while True:
+                        post_response = requests.post(f"{self.BASE_URL}craft/CRAFT_ITEMS/{self.name_craft}", headers=headers)
+                        if post_response.status_code == 200:
+                            self.log(f"Crafting {self.name_craft} berhasil.", Fore.GREEN)
+                            break
+                        elif post_response.status_code == 400:
+                            error_code = post_response.json().get("errorCode", None)
+                            self.log(f"Crafting {self.name_craft} gagal dengan pesan: {error_code}. Mengulangi...", Fore.RED)
+                            time.sleep(3)
+                        else:
+                            post_response.raise_for_status()
+                    return
+
+                response = requests.get(req_url, headers=headers)
+                response.raise_for_status()
+                data = response.json()
+                items = [
+                    {
+                        "id": item.get("id"),
+                        "iconName": item.get("iconName"),
+                        "level": item.get("level"),
+                        "type": item.get("type"),
+                    }
+                    for item in data.get("result", [])
+                ]
 
             except requests.exceptions.RequestException as e:
                 self.log(f"Request gagal: {e}", Fore.RED)
@@ -281,7 +283,6 @@ class coinhunter:
             time.sleep(5)
 
         self.log("Proses upgrade selesai.", Fore.GREEN)
-
 
     def upgrade_to_level_8(self, item, headers, upgrade_url, upgrade_prices):
         while item["level"] < 8:

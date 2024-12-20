@@ -21,11 +21,11 @@ Dengan bot ini, Anda dapat menghemat waktu sekaligus memaksimalkan hasil tanpa p
 
 ---
 
-## 🌟 **Versi v1.6.4**
+## 🌟 **Versi v1.6.5**
 
 ### **Pembaruan pada Versi Ini**:
 
-1. Menambahkan sistem crafting secara otomatis, dengan alur craft items -> weapons -> potions
+1. Membenahi BUG burn dan upgrade item
 
 ---
 
