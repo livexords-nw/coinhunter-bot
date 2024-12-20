@@ -59,8 +59,8 @@ class coinhunter:
         self.power = 0
         self.config = self.load_config()
         self.result = None
-        self.is_crafting_material = None
         self.location = None
+        self.name_craft = None
 
     def banner(self):
             print("     Coinhunters Free Bot")
@@ -205,13 +205,45 @@ class coinhunter:
 
                 for item in items:
                     if item["iconName"] in required_counts:
-                        if required_counts[item["iconName"]] > 1:
-                            self.log(f"Item '{item['iconName']}' melebihi jumlah yang dibutuhkan, akan di-burn.", Fore.YELLOW)
-                            self.burn(id=item["id"], name=item["iconName"])
-                            required_counts[item["iconName"]] -= 1
-                        else:
+                        needed_count = sum(1 for req_item in required_items if req_item["iconName"] == item["iconName"])
+
+                        while required_counts[item["iconName"]] > needed_count:
+                            if item["level"] < 8:
+                                self.log(f"Item '{item['iconName']}' akan di-upgrade ke level 8 sebelum di-burn.", Fore.CYAN)
+                                self.upgrade_to_level_8(item, headers, upgrade_url, upgrade_prices)
+                            else:
+                                self.log(f"Item '{item['iconName']}' melebihi jumlah yang dibutuhkan, akan di-burn.", Fore.YELLOW)
+                                self.burn(id=item["id"], name=item["iconName"])
+                                required_counts[item["iconName"]] -= 1
+
+                        if required_counts[item["iconName"]] <= needed_count:
                             self.log(f"Item '{item['iconName']}' diperlukan untuk crafting, tidak akan di-upgrade atau di-burn.", Fore.GREEN)
-                        continue
+
+                            all_items_available = all(
+                                required_counts.get(req_item["iconName"], 0) >= 
+                                sum(1 for item in required_items if item["iconName"] == req_item["iconName"])
+                                for req_item in required_items
+                            )
+
+                            if all_items_available:
+                                self.log("Semua item yang dibutuhkan untuk crafting tersedia. Meng-upgrade item ke level 8...", Fore.BLUE)
+
+                                for upgrade_item in items:
+                                    if upgrade_item["iconName"] in required_counts and upgrade_item["level"] < 8:
+                                        self.upgrade_to_level_8(upgrade_item, headers, upgrade_url, upgrade_prices)
+                                
+                                while True:
+                                    post_response = requests.post(f"{self.BASE_URL}craft/CRAFT_ITEMS/{self.name_craft}", headers=headers)
+                                    if post_response.status_code == 200:
+                                        self.log(f"Mengupgrade {self.name_craft} berhasil.", Fore.GREEN)
+                                        break
+                                    elif post_response.status_code == 400:
+                                        error_code = post_response.json().get("errorCode", None)
+                                        self.log(f"Mengupgrade {self.name_craft} gagal dengan pesan: {error_code}. Mengulangi...", Fore.RED)
+                                        time.sleep(3)
+                                    else:
+                                        post_response.raise_for_status()
+                                return
 
                     if item["level"] < 8:
                         self.log(f"Item '{item['iconName']}' akan di-upgrade ke level 8.", Fore.CYAN)
@@ -502,30 +534,131 @@ class coinhunter:
             return False
 
     def craft(self, info=True):
-        req_url = f"{self.BASE_URL}craft/CRAFT_ITEMS"
+        craft_url = f"{self.BASE_URL}craft/CRAFT_ITEMS"
+        legendary_url = f"{self.BASE_URL}craft/LEGENDARY_ITEMS"
+        potions_url = f"{self.BASE_URL}craft/POTIONS"
+        weapons_url = f"{self.BASE_URL}craft/WEAPONS"
         headers = {**self.HEADERS, "telegram-data": self.token}
 
         try:
-            response = requests.get(req_url, headers=headers)
-            response.raise_for_status()
+            # Fetch data dari CRAFT_ITEMS
+            craft_response = requests.get(craft_url, headers=headers)
+            craft_response.raise_for_status()
 
-            data = response.json()
-            if not data.get("ok"):
-                raise ValueError("Response indicates failure: 'ok' field is False.")
+            craft_data = craft_response.json()
+            if not craft_data.get("ok"):
+                raise ValueError("Response CRAFT_ITEMS indicates failure: 'ok' field is False.")
 
-            result = data.get("result")
-            if not result:
-                raise ValueError("Data 'result' tidak ditemukan dalam respons.")
+            craft_result = craft_data.get("result")
+            if not craft_result:
+                raise ValueError("Data 'result' tidak ditemukan dalam respons CRAFT_ITEMS.")
 
-            for item in result:
+            # Fetch data dari LEGENDARY_ITEMS
+            legendary_response = requests.get(legendary_url, headers=headers)
+            legendary_response.raise_for_status()
+
+            legendary_data = legendary_response.json()
+            if not legendary_data.get("ok"):
+                raise ValueError("Response LEGENDARY_ITEMS indicates failure: 'ok' field is False.")
+
+            legendary_result = legendary_data.get("result")
+            if not legendary_result:
+                raise ValueError("Data 'result' tidak ditemukan dalam respons LEGENDARY_ITEMS.")
+
+            # Fetch data dari POTIONS
+            potions_response = requests.get(potions_url, headers=headers)
+            potions_response.raise_for_status()
+
+            potions_data = potions_response.json()
+            if not potions_data.get("ok"):
+                raise ValueError("Response POTIONS indicates failure: 'ok' field is False.")
+
+            potions_result = potions_data.get("result")
+            if not potions_result:
+                raise ValueError("Data 'result' tidak ditemukan dalam respons POTIONS.")
+
+            # Fetch data dari WEAPONS
+            weapons_response = requests.get(weapons_url, headers=headers)
+            weapons_response.raise_for_status()
+
+            weapons_data = weapons_response.json()
+            if not weapons_data.get("ok"):
+                raise ValueError("Response WEAPONS indicates failure: 'ok' field is False.")
+
+            weapons_result = weapons_data.get("result")
+            if not weapons_result:
+                raise ValueError("Data 'result' tidak ditemukan dalam respons WEAPONS.")
+
+            # Map bahan yang bisa dibuat dari LEGENDARY_ITEMS
+            legendary_map = {
+                item["name"]: item for item in legendary_result
+            }
+
+            # Proses data dari CRAFT_ITEMS
+            for item in craft_result:
                 if item['level'] < 8:
                     if info:
                         self.log(f"Hasil crafting '{item['name']}' memiliki level {item['level']}. Upgrade ke level 8 diperlukan.", Fore.YELLOW)
-                    return item['items']
+                        self.name_craft = item['name']
+
+                    crafting_items = item.get("items", [])
+                    for crafting_material in crafting_items:
+                        icon_name = crafting_material["iconName"]
+
+                        # Jika bahan ini bisa dibuat dari LEGENDARY_ITEMS
+                        if icon_name in legendary_map:
+                            legendary_recipe = legendary_map[icon_name]
+                            if info:
+                                self.log(f"Bahan '{icon_name}' diperlukan untuk crafting '{item['name']}'. Membuat dari LEGENDARY_ITEMS: '{legendary_recipe['name']}'.", Fore.CYAN)
+                            return legendary_recipe["items"]
+
+                    # Jika semua bahan tersedia tanpa LEGENDARY_ITEMS
+                    return crafting_items
                 else:
                     if info:
                         self.log(f"Hasil crafting '{item['name']}' sudah memenuhi syarat (Level {item['level']}).", Fore.GREEN)
                     return item
+
+            # Jika semua item dari CRAFT_ITEMS sudah level 8, lanjutkan ke WEAPONS
+            if info:
+                self.log("Semua item dari CRAFT_ITEMS sudah level 8. Anda dapat melanjutkan ke WEAPONS.", Fore.CYAN)
+
+            # Fokus pada item vaporizer di WEAPONS yang membutuhkan item dari LEGENDARY_ITEMS
+            for weapon in weapons_result:
+                if weapon['name'] == 'vaporizer' and weapon['level'] < 8:
+                    if info:
+                        self.log(f"Item '{weapon['name']}' dari WEAPONS memiliki level {weapon['level']}. Upgrade ke level 8 diperlukan.", Fore.YELLOW)
+                        self.name_craft = weapon['name']
+
+                    crafting_items = weapon.get("items", [])
+                    for crafting_material in crafting_items:
+                        icon_name = crafting_material["iconName"]
+
+                        # Jika bahan ini bisa dibuat dari LEGENDARY_ITEMS
+                        if icon_name in legendary_map:
+                            legendary_recipe = legendary_map[icon_name]
+                            if info:
+                                self.log(f"Bahan '{icon_name}' diperlukan untuk crafting '{weapon['name']}'. Membuat dari LEGENDARY_ITEMS: '{legendary_recipe['name']}'.", Fore.CYAN)
+                            return legendary_recipe["items"]
+
+                    # Jika semua bahan tersedia tanpa LEGENDARY_ITEMS
+                    return crafting_items
+
+            # Jika semua item WEAPONS selesai, lanjutkan ke POTIONS
+            if info:
+                self.log("Semua item dari WEAPONS sudah selesai. Anda dapat melanjutkan ke POTIONS.", Fore.CYAN)
+
+            for potion in potions_result:
+                if info:
+                    self.log(f"Crafting '{potion['name']}' dari POTIONS.", Fore.CYAN)
+                return potion["items"]
+
+        except requests.RequestException as e:
+            self.log(f"Error saat mengakses API: {e}", Fore.RED)
+            raise
+        except ValueError as e:
+            self.log(f"Error dalam validasi data: {e}", Fore.RED)
+            raise
 
         except requests.exceptions.RequestException as e:
             self.log(f"Request failed: {e}", Fore.RED)

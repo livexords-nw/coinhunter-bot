@@ -15,20 +15,21 @@ Bot ini dirancang untuk mengotomatiskan berbagai tugas di **Coin Hunter**, seper
 - **Peningkatan Level Item otomatis**
 - **Penyelesaian Tugas otomatis**
 - **Pemecahan dan Klaim Peti otomatis**
+- **Crafting item secara otomatis**
 
 Dengan bot ini, Anda dapat menghemat waktu sekaligus memaksimalkan hasil tanpa perlu interaksi manual.
 
 ---
 
-## 🌟 **Versi v1.5.4**
+## 🌟 **Versi v1.6.4**
 
 ### **Pembaruan pada Versi Ini**:
 
-1. Sekarang chest akan dipilah isinya apakah item dari chest dibutuhkan untuk crafting atau tidak
+1. Menambahkan sistem crafting secara otomatis, dengan alur craft items -> weapons -> potions
 
 ---
 
-### **Fitur dalam Versi 1.5.4**:
+### **Fitur dalam Versi 1.6.4**:
 
 1. **Auto Farming**: Mengklaim hasil farming secara otomatis.
 2. **Auto Spin Wheel**: Memutar Spin Wheel tanpa interaksi manual.
@@ -38,10 +39,11 @@ Dengan bot ini, Anda dapat menghemat waktu sekaligus memaksimalkan hasil tanpa p
 6. **Auto Tasks**: Menyelesaikan tugas harian secara otomatis.
 7. **Auto Chest**: Memecahkan puzzle peti dan klaim secara otomatis.
 8. **Auto-claim-reff**: Mengclaim reff point secara otomatis
+9. **Auto Craft**: kamu bisa mengcraft item secara otomatis.
 
 ### **Rencana Pengembangan Selanjutnya (Coming Soon)**:
 
-1. Craft otomatis
+1. Pengoptimalan script
 
 ---
 
@@ -118,7 +120,8 @@ Mulai gunakan Coin Hunter dengan mendaftar melalui tautan berikut:
 - **Auto Upgrade**: Peningkatan level item secara otomatis.
 - **Auto Tasks**: Penyelesaian tugas harian secara otomatis.
 - **Auto Chest**: Memecahkan puzzle peti dan klaim otomatis.
-- **Auto claim reff**: Mengclaim point reff secara otomatis.
+- **Auto Claim Reff**: Mengclaim point reff secara otomatis.
+- **Auto Crafting**: Mengotomatiskan system crafting.
 
 ---
 
