@@ -204,24 +204,27 @@ class coinhunter:
                         required_counts[item["iconName"]] += 1
 
                 for item in items:
-                    needed_count = sum(1 for req_item in required_items if req_item["iconName"] == item["iconName"])
+                    if item["iconName"] in required_counts:
+                        needed_count = sum(1 for req_item in required_items if req_item["iconName"] == item["iconName"])
 
-                    if item["iconName"] in required_counts and required_counts[item["iconName"]] <= needed_count:
-                        self.log(f"Item '{item['iconName']}' diperlukan untuk crafting, tidak akan di-burn atau di-upgrade.", Fore.GREEN)
-                        continue
+                        if required_counts[item["iconName"]] <= needed_count:
+                            self.log(f"Item '{item['iconName']}' diperlukan untuk crafting, tidak akan di-burn atau di-upgrade.", Fore.GREEN)
+                            continue
 
-                    excess_count = required_counts[item["iconName"]] - needed_count
+                        excess_count = required_counts[item["iconName"]] - needed_count
 
-                    if excess_count > 0:
-                        if item["level"] < 8:
-                            self.log(f"Item '{item['iconName']}' akan di-upgrade ke level 8 karena melebihi kebutuhan.", Fore.CYAN)
-                            self.upgrade_to_level_8(item, headers, upgrade_url, upgrade_prices)
+                        if excess_count > 0:
+                            if item["level"] < 8:
+                                self.log(f"Item '{item['iconName']}' akan di-upgrade ke level 8 karena melebihi kebutuhan.", Fore.CYAN)
+                                self.upgrade_to_level_8(item, headers, upgrade_url, upgrade_prices)
 
-                        self.log(f"Item '{item['iconName']}' akan di-burn karena melebihi kebutuhan.", Fore.YELLOW)
-                        self.burn(id=item["id"], name=item["iconName"])
-                        required_counts[item["iconName"]] -= 1
+                            self.log(f"Item '{item['iconName']}' akan di-burn karena melebihi kebutuhan.", Fore.YELLOW)
+                            self.burn(id=item["id"], name=item["iconName"])
+                            required_counts[item["iconName"]] -= 1
 
-                    elif item["iconName"] not in required_counts:
+                    else:
+                        self.log(f"Item '{item['iconName']}' tidak dibutuhkan untuk crafting.", Fore.MAGENTA)
+
                         if item["level"] < 8:
                             self.log(f"Item '{item['iconName']}' tidak dibutuhkan untuk crafting. Akan di-upgrade ke level 8.", Fore.CYAN)
                             self.upgrade_to_level_8(item, headers, upgrade_url, upgrade_prices)
@@ -283,6 +286,7 @@ class coinhunter:
             time.sleep(5)
 
         self.log("Proses upgrade selesai.", Fore.GREEN)
+
 
     def upgrade_to_level_8(self, item, headers, upgrade_url, upgrade_prices):
         while item["level"] < 8:
