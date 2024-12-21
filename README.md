@@ -21,11 +21,11 @@ Dengan bot ini, Anda dapat menghemat waktu sekaligus memaksimalkan hasil tanpa p
 
 ---
 
-## 🌟 **Versi v1.6.5**
+## 🌟 **Versi v1.6.6**
 
 ### **Pembaruan pada Versi Ini**:
 
-1. Membenahi BUG burn dan upgrade item
+1. Membenahi BUG crafting
 
 ---
 

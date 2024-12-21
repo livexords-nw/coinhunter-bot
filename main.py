@@ -61,6 +61,7 @@ class coinhunter:
         self.result = None
         self.location = None
         self.name_craft = None
+        self.type_craft = None
 
     def banner(self):
             print("     Coinhunters Free Bot")
@@ -246,7 +247,7 @@ class coinhunter:
                             self.upgrade_to_level_8(upgrade_item, headers, upgrade_url, upgrade_prices)
 
                     while True:
-                        post_response = requests.post(f"{self.BASE_URL}craft/CRAFT_ITEMS/{self.name_craft}", headers=headers)
+                        post_response = requests.post(f"{self.BASE_URL}craft/{self.type_craft}/{self.name_craft}", headers=headers)
                         if post_response.status_code == 200:
                             self.log(f"Crafting {self.name_craft} berhasil.", Fore.GREEN)
                             break
@@ -546,7 +547,6 @@ class coinhunter:
         headers = {**self.HEADERS, "telegram-data": self.token}
 
         try:
-            # Fetch data dari CRAFT_ITEMS
             craft_response = requests.get(craft_url, headers=headers)
             craft_response.raise_for_status()
 
@@ -558,7 +558,6 @@ class coinhunter:
             if not craft_result:
                 raise ValueError("Data 'result' tidak ditemukan dalam respons CRAFT_ITEMS.")
 
-            # Fetch data dari LEGENDARY_ITEMS
             legendary_response = requests.get(legendary_url, headers=headers)
             legendary_response.raise_for_status()
 
@@ -570,7 +569,6 @@ class coinhunter:
             if not legendary_result:
                 raise ValueError("Data 'result' tidak ditemukan dalam respons LEGENDARY_ITEMS.")
 
-            # Fetch data dari POTIONS
             potions_response = requests.get(potions_url, headers=headers)
             potions_response.raise_for_status()
 
@@ -582,7 +580,6 @@ class coinhunter:
             if not potions_result:
                 raise ValueError("Data 'result' tidak ditemukan dalam respons POTIONS.")
 
-            # Fetch data dari WEAPONS
             weapons_response = requests.get(weapons_url, headers=headers)
             weapons_response.raise_for_status()
 
@@ -594,12 +591,10 @@ class coinhunter:
             if not weapons_result:
                 raise ValueError("Data 'result' tidak ditemukan dalam respons WEAPONS.")
 
-            # Map bahan yang bisa dibuat dari LEGENDARY_ITEMS
             legendary_map = {
                 item["name"]: item for item in legendary_result
             }
 
-            # Proses data dari CRAFT_ITEMS
             for item in craft_result:
                 if item['level'] < 8:
                     if info:
@@ -610,25 +605,23 @@ class coinhunter:
                     for crafting_material in crafting_items:
                         icon_name = crafting_material["iconName"]
 
-                        # Jika bahan ini bisa dibuat dari LEGENDARY_ITEMS
                         if icon_name in legendary_map:
                             legendary_recipe = legendary_map[icon_name]
                             if info:
                                 self.log(f"Bahan '{icon_name}' diperlukan untuk crafting '{item['name']}'. Membuat dari LEGENDARY_ITEMS: '{legendary_recipe['name']}'.", Fore.CYAN)
+                                self.type_craft = "LEGENDARY_ITEMS"
                             return legendary_recipe["items"]
 
-                    # Jika semua bahan tersedia tanpa LEGENDARY_ITEMS
+                        self.type_craft = "CRAFT_ITEMS"
                     return crafting_items
                 else:
                     if info:
                         self.log(f"Hasil crafting '{item['name']}' sudah memenuhi syarat (Level {item['level']}).", Fore.GREEN)
                     return item
 
-            # Jika semua item dari CRAFT_ITEMS sudah level 8, lanjutkan ke WEAPONS
             if info:
                 self.log("Semua item dari CRAFT_ITEMS sudah level 8. Anda dapat melanjutkan ke WEAPONS.", Fore.CYAN)
 
-            # Fokus pada item vaporizer di WEAPONS yang membutuhkan item dari LEGENDARY_ITEMS
             for weapon in weapons_result:
                 if weapon['name'] == 'vaporizer' and weapon['level'] < 8:
                     if info:
@@ -639,23 +632,23 @@ class coinhunter:
                     for crafting_material in crafting_items:
                         icon_name = crafting_material["iconName"]
 
-                        # Jika bahan ini bisa dibuat dari LEGENDARY_ITEMS
                         if icon_name in legendary_map:
                             legendary_recipe = legendary_map[icon_name]
                             if info:
                                 self.log(f"Bahan '{icon_name}' diperlukan untuk crafting '{weapon['name']}'. Membuat dari LEGENDARY_ITEMS: '{legendary_recipe['name']}'.", Fore.CYAN)
+                                self.type_craft = "LEGENDARY_ITEMS"
                             return legendary_recipe["items"]
 
-                    # Jika semua bahan tersedia tanpa LEGENDARY_ITEMS
+                        self.type_craft = "WEAPONS"
                     return crafting_items
 
-            # Jika semua item WEAPONS selesai, lanjutkan ke POTIONS
             if info:
                 self.log("Semua item dari WEAPONS sudah selesai. Anda dapat melanjutkan ke POTIONS.", Fore.CYAN)
 
             for potion in potions_result:
                 if info:
                     self.log(f"Crafting '{potion['name']}' dari POTIONS.", Fore.CYAN)
+                    self.type_craft = "POTIONS"
                 return potion["items"]
 
         except requests.RequestException as e:
