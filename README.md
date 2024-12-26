@@ -1,55 +1,57 @@
 ---
 <h1 align="center">Coin Hunter Bot</h1>
 
-<p align="center">Automasi tugas pada Coin Hunter untuk meningkatkan efisiensi dan hasil Anda!</p>
----
-
-## 🚀 **Tentang Bot**
-
-Bot ini dirancang untuk mengotomatiskan berbagai tugas di **Coin Hunter**, seperti:
-
-- **Farming otomatis**
-- **Memutar Spin Wheel otomatis**
-- **Klaim Login Harian otomatis**
-- **Penyelesaian Misi otomatis**
-- **Peningkatan Level Item otomatis**
-- **Penyelesaian Tugas otomatis**
-- **Pemecahan dan Klaim Peti otomatis**
-- **Crafting item secara otomatis**
-
-Dengan bot ini, Anda dapat menghemat waktu sekaligus memaksimalkan hasil tanpa perlu interaksi manual.
+<p align="center">Automate tasks in Coin Hunter to increase your efficiency and results!</p>
 
 ---
 
-## 🌟 **Versi v1.6.6**
+## 🚀 **About the Bot**
 
-### **Pembaruan pada Versi Ini**:
+This bot is designed to automate various tasks in **Coin Hunter**, such as:
 
-1. Membenahi BUG crafting
+- **Automatic Farming**
+- **Automatic Spin Wheel**
+- **Automatic Daily Login Claim**
+- **Automatic Mission Completion**
+- **Automatic Item Upgrade**
+- **Automatic Task Completion**
+- **Automatic Chest Puzzle Solving and Claiming**
+- **Automatic Item Crafting**
 
----
-
-### **Fitur dalam Versi 1.6.4**:
-
-1. **Auto Farming**: Mengklaim hasil farming secara otomatis.
-2. **Auto Spin Wheel**: Memutar Spin Wheel tanpa interaksi manual.
-3. **Auto Daily Login Claim**: Klaim reward harian otomatis.
-4. **Auto Missions**: Menyelesaikan misi dengan otomatisasi penuh.
-5. **Auto Upgrade**: Melakukan upgrade item untuk hasil lebih maksimal.
-6. **Auto Tasks**: Menyelesaikan tugas harian secara otomatis.
-7. **Auto Chest**: Memecahkan puzzle peti dan klaim secara otomatis.
-8. **Auto-claim-reff**: Mengclaim reff point secara otomatis
-9. **Auto Craft**: kamu bisa mengcraft item secara otomatis.
-
-### **Rencana Pengembangan Selanjutnya (Coming Soon)**:
-
-1. Pengoptimalan script
+With this bot, you can save time while maximizing your results without manual interaction.
 
 ---
 
-## 📥 **Cara Registrasi**
+## 🌟 **Version v1.6.7**
 
-Mulai gunakan Coin Hunter dengan mendaftar melalui tautan berikut:
+### **Updates in This Version**:
+
+1. **Bug Fix**: Fixed the item filter bug that occurred when trying to send users to a specific map.
+2. Translated all functions and messages into **English** for better accessibility.
+3. Improved user-friendliness with clear prompts and configurable options.
+
+---
+
+## ⚙️ **Configuration in `config.json`**
+
+| **Function**           | **Description**                             | **Default** |
+| ---------------------- | ------------------------------------------- | ----------- |
+| `daily`                | Automatically claim daily login rewards     | `True`      |
+| `wheel`                | Automatically spin the wheel                | `True`      |
+| `farm`                 | Automatically farm                          | `True`      |
+| `mission`              | Automatically complete missions             | `True`      |
+| `upgrade`              | Automatically upgrade item levels           | `True`      |
+| `tasks`                | Automatically complete tasks                | `True`      |
+| `chest`                | Automatically solve chest puzzles and claim | `True`      |
+| `reff`                 | Automatically claim referral points         | `True`      |
+| `delay_account_switch` | Delay before switching accounts             | `10`        |
+| `delay_loop`           | Delay before looping again                  | `3000`      |
+
+---
+
+## 📥 **How to Register**
+
+Start using Coin Hunter by registering via the link below:
 
 <div align="center">
   <a href="https://t.me/CoinHuntersGameBot/app?startapp=hunter_62f2b4787229bd5b09a541d53180f956" target="_blank">
@@ -59,51 +61,34 @@ Mulai gunakan Coin Hunter dengan mendaftar melalui tautan berikut:
 
 ---
 
-## ⚙️ **Pengaturan di `config.json`**
+## 📖 **Installation Steps**
 
-| **Fungsi**              | **Deskripsi**                             | **Default** |
-| ----------------------- | ----------------------------------------- | ----------- |
-| `daily`                 | Klaim login harian secara otomatis        | `True`      |
-| `wheel`                 | Memutar Spin Wheel otomatis               | `True`      |
-| `farm`                  | Farming otomatis                          | `True`      |
-| `mission`               | Menyelesaikan misi otomatis               | `True`      |
-| `upgrade`               | Upgrade level item otomatis               | `True`      |
-| `tasks`                 | Menyelesaikan tugas otomatis              | `True`      |
-| `chest`                 | Memecahkan puzzle peti dan klaim otomatis | `True`      |
-| `reff`                  | Mengclaim point reff secara otomatis      | `True`      |
-| `delay_pergantian_akun` | Delay saat akan berganti akun             | `10`        |
-| `delay_loop`            | Delay saat akan melakukan looping kembali | `3000`      |
-
----
-
-## 📖 **Langkah Instalasi**
-
-1. **Clone Repository**  
-   Salin proyek ke perangkat lokal Anda:
+1. **Clone the Repository**  
+   Clone the project to your local machine:
 
    ```bash
    git clone https://github.com/livexords-nw/CoinHunter-bot.git
    ```
 
-2. **Masuk ke Folder Proyek**  
-   Arahkan terminal ke folder proyek:
+2. **Navigate to the Project Folder**  
+   Use the terminal to go to the project folder:
 
    ```bash
    cd CoinHunter-bot
    ```
 
-3. **Pasang Dependensi**  
-   Instal semua pustaka yang diperlukan:
+3. **Install Dependencies**  
+   Install all required libraries:
 
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Konfigurasi Query**  
-   Buat file `query.txt` dan masukkan data query Coin Hunter Anda ke dalamnya.
+4. **Configure Queries**  
+   Create a `query.txt` file and insert your Coin Hunter queries in it.
 
-5. **Jalankan Bot**  
-   Eksekusi bot dengan perintah:
+5. **Run the Bot**  
+   Execute the bot with the following command:
 
    ```bash
    python main.py
@@ -111,23 +96,23 @@ Mulai gunakan Coin Hunter dengan mendaftar melalui tautan berikut:
 
 ---
 
-## 🚀 **Ringkasan Fitur Utama**
+## 🚀 **Key Features**
 
-- **Auto Farming**: Klaim hasil farming otomatis.
-- **Auto Spin Wheel**: Memutar roda Spin otomatis.
-- **Auto Daily Login Claim**: Klaim reward login harian tanpa interaksi manual.
-- **Auto Missions**: Penyelesaian misi otomatis.
-- **Auto Upgrade**: Peningkatan level item secara otomatis.
-- **Auto Tasks**: Penyelesaian tugas harian secara otomatis.
-- **Auto Chest**: Memecahkan puzzle peti dan klaim otomatis.
-- **Auto Claim Reff**: Mengclaim point reff secara otomatis.
-- **Auto Crafting**: Mengotomatiskan system crafting.
+- **Auto Farming**: Automatically claims farming results.
+- **Auto Spin Wheel**: Spins the wheel without manual interaction.
+- **Auto Daily Login Claim**: Automatically claims daily login rewards.
+- **Auto Missions**: Automatically completes missions.
+- **Auto Upgrade**: Automatically upgrades items for better results.
+- **Auto Tasks**: Automatically completes daily tasks.
+- **Auto Chest**: Automatically solves chest puzzles and claims rewards.
+- **Auto Claim Reff**: Automatically claims referral points.
+- **Auto Crafting**: Automates the crafting process.
 
 ---
 
-## 🛠️ **Kontribusi**
+## 🛠️ **Contributing**
 
-Proyek ini dikembangkan oleh **Livexords**. Jika Anda memiliki saran, pertanyaan, atau ingin berkontribusi, silakan hubungi kami melalui tautan berikut:
+This project is developed by **Livexords**. If you have suggestions, questions, or want to contribute, feel free to contact us via the link below:
 
 <div align="center">
   <a href="https://t.me/livexordsscript" target="_blank">
