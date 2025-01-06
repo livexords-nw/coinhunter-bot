@@ -22,13 +22,12 @@ With this bot, you can save time while maximizing your results without manual in
 
 ---
 
-## 🌟 **Version v1.6.7**
+## 🌟 **Version v1.7.7**
 
 ### **Updates in This Version**:
 
-1. **Bug Fix**: Fixed the item filter bug that occurred when trying to send users to a specific map.
-2. Translated all functions and messages into **English** for better accessibility.
-3. Improved user-friendliness with clear prompts and configurable options.
+1. Addition of blue maps, fishing spots, and required crafting items are now prioritized based on the map with the highest drop rate percentage, not just the closest one.
+2. Upgrade patterns have been improved for better optimization.
 
 ---
 

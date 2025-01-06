@@ -6,6 +6,7 @@ import time
 import requests
 from colorama import Fore
 
+
 class coinhunter:
 
     BASE_URL = "https://europe-central2-coinhuntersprod.cloudfunctions.net/api/"
@@ -63,6 +64,7 @@ class coinhunter:
                 "fuel-depot",
                 "robbed-truck",
                 "muddy-patch",
+                "fishing-spot-1",
             ],
             "items": ["food-can", "lucky-clever", "microchip", "zombie-tooth"],
         },
@@ -83,7 +85,12 @@ class coinhunter:
         },
         {
             "name": "robbed-truck",
-            "neighbors": ["checkpoint-charlie", "water-plant"],
+            "neighbors": [
+                "checkpoint-charlie",
+                "water-plant",
+                "fishing-spot-2",
+                "fishing-spot-1",
+            ],
             "items": ["food-can", "lucky-clever", "dirty-textile", "zombie-tooth"],
         },
         {
@@ -108,13 +115,95 @@ class coinhunter:
         },
         {
             "name": "water-plant",
-            "neighbors": ["robbed-truck"],
+            "neighbors": ["robbed-truck", "las-vegas"],
             "items": ["food-can", "bolt", "zombie-blood"],
         },
         {
             "name": "abandoned-checkpoint",
-            "neighbors": ["swampy-ground", "wrecked-house"],
+            "neighbors": ["swampy-ground", "wrecked-house", "soon-airdrop", "helipad"],
             "items": ["food-can", "copper-wire", "zombie-tooth"],
+        },
+        {
+            "name": "soon-airdrop",
+            "neighbors": [
+                "abandoned-checkpoint",
+                "helipad",
+                "helipad",
+                "las-vegas",
+                "cemetery",
+            ],
+            "items": ["pizza-slice", "leather", "bamboo_v2"],
+        },
+        {
+            "name": "helipad",
+            "neighbors": ["abandoned-checkpoint", "soon-airdrop", "radiostation"],
+            "items": ["food-can", "screw", "zombie-blood"],
+        },
+        {
+            "name": "radiostation",
+            "neighbors": ["helipad"],
+            "items": ["food-can", "copper-wire", "glass", "battery"],
+        },
+        {
+            "name": "las-vegas",
+            "neighbors": ["cemetery", "soon-airdrop", "water-plant", "bay"],
+            "items": [
+                "lucky-clever",
+                "fish-hook",
+                "tickets",
+                "coupon-hunt-5",
+                "reset-egg",
+            ],
+        },
+        {
+            "name": "cemetery",
+            "neighbors": ["las-vegas", "soon-airdrop", "bay", "fishing-spot-3"],
+            "items": ["food-can", "zombie-blood", "zombie-tooth", "silver-bar"],
+        },
+        {
+            "name": "fishing-spot-3",
+            "neighbors": ["cemetery", "metro-1"],
+            "items": ["swamp-oyster", "bolt", "tickets", "coupon-hunt-5"],
+        },
+        {
+            "name": "metro-1",
+            "neighbors": ["fishing-spot-3"],
+            "items": ["food-can", "zombie-blood", "copper-wire", "wrench"],
+        },
+        {
+            "name": "bay",
+            "neighbors": ["cemetery", "las-vegas", "pirates"],
+            "items": ["salted-fish", "fish-hook", "microchip"],
+        },
+        {
+            "name": "pirates",
+            "neighbors": ["bay", "mines", "west-lighthouse"],
+            "items": ["bomb", "pirates-gold", "pirate-rum"],
+        },
+        {
+            "name": "mines",
+            "neighbors": ["pirates", "containers"],
+            "items": ["food-can", "iron-bar"],
+        },
+        {
+            "name": "containers",
+            "neighbors": ["mines"],
+            "items": ["salted-fish", "rubber", "fish-hook", "bolt"],
+        },
+        {
+            "name": "west-lighthouse",
+            "neighbors": ["pirates"],
+            "items": ["food-can", "battery", "fishing-line"],
+        },
+        {
+            "name": "fishing-spot-2",
+            "neighbors": ["robbed-truck"],
+            "items": ["food-can", "lucky-clever", "dirty-textile", "zombie-tooth"],
+        },
+        {
+            "name": "fishing-spot-1",
+            "neighbors": ["robbed-truck", "checkpoint-charlie"],
+            "items": ["food-can", "lucky-clever", "microchip", "zombie-tooth"],
         },
     ]
 
@@ -132,40 +221,69 @@ class coinhunter:
         self.name_craft = None
         self.type_craft = None
 
-    def banner(self):
-        """
-        Display the bot's banner with information about the creator and the channel.
-        """
-        print("🎉 Welcome to Coinhunters Free Bot 🎉")
-        print("🚀 Created by LIVEXORDS\n")
-        print("📢 Join our channel: t.me/livexordsscript\n")
+    def banner(self) -> None:
+        """Displays the banner for the bot."""
+        self.log("🎉 CoinHunters Free Bot", Fore.CYAN)
+        self.log("🚀 Created by LIVEXORDS", Fore.CYAN)
+        self.log("📢 Channel: t.me/livexordsscript\n", Fore.CYAN)
 
     def log(self, message, color=Fore.RESET):
         print(
             Fore.LIGHTBLACK_EX
-            + datetime.now().strftime("[%Y:%m:%d:%H:%M:%S] |")
+            + datetime.now().strftime("[%Y:%m:%d ~ %H:%M:%S] |")
             + " "
             + color
             + message
             + Fore.RESET
         )
 
-    def load_config(self):
+    def load_config(self) -> dict:
         """
-        Reads configuration from the 'config.json' file.
-        Returns the configuration data if successful, or an empty dictionary if an error occurs.
+        Loads configuration from config.json.
+
+        Returns:
+            dict: Configuration data or an empty dictionary if an error occurs.
         """
         try:
             with open("config.json", "r") as config_file:
-                config_data = json.load(config_file)
-                print("✅ Config loaded successfully!")
-                return config_data
+                config = json.load(config_file)
+                self.log("✅ Configuration loaded successfully.", Fore.GREEN)
+                return config
         except FileNotFoundError:
-            print("❌ 'config.json' file not found! Please make sure the file exists.")
+            self.log("❌ File not found: config.json", Fore.RED)
             return {}
         except json.JSONDecodeError:
-            print("⚠️ Error occurred while reading 'config.json'. Invalid JSON format!")
+            self.log("❌ Failed to parse config.json. Please check the file format.", Fore.RED)
             return {}
+
+    def load_query(self, path_file: str = "query.txt") -> list:
+        """
+        Loads a list of queries from the specified file.
+
+        Args:
+            path_file (str): The path to the query file. Defaults to "query.txt".
+
+        Returns:
+            list: A list of queries or an empty list if an error occurs.
+        """
+        self.banner()
+
+        try:
+            with open(path_file, "r") as file:
+                queries = [line.strip() for line in file if line.strip()]
+
+            if not queries:
+                self.log(f"⚠️ Warning: {path_file} is empty.", Fore.YELLOW)
+
+            self.log(f"✅ Loaded {len(queries)} queries from {path_file}.", Fore.GREEN)
+            return queries
+
+        except FileNotFoundError:
+            self.log(f"❌ File not found: {path_file}", Fore.RED)
+            return []
+        except Exception as e:
+            self.log(f"❌ Unexpected error loading queries: {e}", Fore.RED)
+            return []
 
     def login(self, index: int) -> None:
         """Login to the API using the query list."""
@@ -208,31 +326,6 @@ class coinhunter:
             self.log(f"⚠️ Data error: {e}", Fore.RED)
         except Exception as e:
             self.log(f"❌ Unexpected error: {e}", Fore.RED)
-
-    def load_query(self, path_file="query.txt"):
-        """
-        Loads queries from a text file. If the file is empty or not found, it handles errors gracefully.
-        Displays relevant messages to the user.
-        """
-        self.banner()
-
-        try:
-            with open(path_file, "r") as file:
-                queries = [line.strip() for line in file if line.strip()]
-
-            if not queries:
-                print("⚠️ Warning: The file is empty, no queries to load.")
-                return []
-
-            print(f"✅ Data Loaded: {len(queries)} queries successfully loaded!")
-            return queries
-
-        except FileNotFoundError:
-            print(f"❌ Error: The file '{path_file}' was not found!")
-            return []
-        except Exception as e:
-            print(f"⚠️ Error while loading queries: {e}")
-            return []
 
     def get_upgrade_prices(self) -> dict:
         """Fetch upgrade price data from the API."""
@@ -302,7 +395,9 @@ class coinhunter:
                 for item in items:
                     if item["iconName"] in required_counts:
                         needed_count = sum(
-                            1 for req_item in required_items if req_item["iconName"] == item["iconName"]
+                            1
+                            for req_item in required_items
+                            if req_item["iconName"] == item["iconName"]
                         )
 
                         if required_counts[item["iconName"]] <= needed_count:
@@ -320,7 +415,9 @@ class coinhunter:
                                     f"🔧 Item '{item['iconName']}' will be upgraded to level 8 due to excess count.",
                                     Fore.CYAN,
                                 )
-                                self.upgrade_to_level_8(item, headers, upgrade_url, upgrade_prices)
+                                self.upgrade_to_level_8(
+                                    item, headers, upgrade_url, upgrade_prices
+                                )
 
                             self.log(
                                 f"❌ Item '{item['iconName']}' will be burned due to excess count.",
@@ -340,7 +437,9 @@ class coinhunter:
                                 f"🔧 Item '{item['iconName']}' is not needed. Upgrading to level 8.",
                                 Fore.CYAN,
                             )
-                            self.upgrade_to_level_8(item, headers, upgrade_url, upgrade_prices)
+                            self.upgrade_to_level_8(
+                                item, headers, upgrade_url, upgrade_prices
+                            )
 
                         self.log(
                             f"❌ Item '{item['iconName']}' is not needed. Burning the item.",
@@ -369,7 +468,9 @@ class coinhunter:
                             upgrade_item["iconName"] in required_counts
                             and upgrade_item["level"] < 8
                         ):
-                            self.upgrade_to_level_8(upgrade_item, headers, upgrade_url, upgrade_prices)
+                            self.upgrade_to_level_8(
+                                upgrade_item, headers, upgrade_url, upgrade_prices
+                            )
 
                     while True:
                         post_response = requests.post(
@@ -377,10 +478,15 @@ class coinhunter:
                             headers=headers,
                         )
                         if post_response.status_code == 200:
-                            self.log(f"🎉 Successfully crafted {self.name_craft}.", Fore.GREEN)
+                            self.log(
+                                f"🎉 Successfully crafted {self.name_craft}.",
+                                Fore.GREEN,
+                            )
                             break
                         elif post_response.status_code == 400:
-                            error_code = post_response.json().get("errorCode", "Unknown Error")
+                            error_code = post_response.json().get(
+                                "errorCode", "Unknown Error"
+                            )
                             self.log(
                                 f"❌ Crafting {self.name_craft} failed with message: {error_code}. Retrying...",
                                 Fore.RED,
@@ -489,7 +595,9 @@ class coinhunter:
 
             result = response.json().get("ok")
             if result:
-                self.log(f"🎉 Successfully upgraded hunter using item: {name}", Fore.GREEN)
+                self.log(
+                    f"🎉 Successfully upgraded hunter using item: {name}", Fore.GREEN
+                )
                 self.info()
             else:
                 self.log(f"❌ Failed to upgrade hunter using item: {name}", Fore.RED)
@@ -515,13 +623,13 @@ class coinhunter:
                 if not data:
                     raise ValueError("No 'result' data found in the response.")
 
-                reward_type = data.get('userReward', {}).get('type', "Unknown")
-                reward_amount = data.get('userReward', {}).get('amount', 0)
-                reward_rarity = data.get('userReward', {}).get('rarity', "Unknown")
+                reward_type = data.get("userReward", {}).get("type", "Unknown")
+                reward_amount = data.get("userReward", {}).get("amount", 0)
+                reward_rarity = data.get("userReward", {}).get("rarity", "Unknown")
 
                 self.log(
                     f"🎉 Reward Received! Type: {reward_type}, Amount: {reward_amount}, Rarity: {reward_rarity}",
-                    Fore.GREEN
+                    Fore.GREEN,
                 )
 
             except requests.exceptions.RequestException as e:
@@ -565,7 +673,10 @@ class coinhunter:
             response = requests.post(req_url, headers=headers)
             response.raise_for_status()
 
-            self.log("🎉 Successfully claimed farming rewards! You received items.", Fore.GREEN)
+            self.log(
+                "🎉 Successfully claimed farming rewards! You received items.",
+                Fore.GREEN,
+            )
             self.map()
 
         except requests.exceptions.RequestException as e:
@@ -576,8 +687,27 @@ class coinhunter:
             self.log(f"⚠️ Data error: {e}", Fore.RED)
         except Exception as e:
             self.log(f"❌ Farm | Unexpected error: {e}", Fore.RED)
+    
+    def api_request(self, endpoint, params=None):
+        """
+        Generalized API request handler.
+        """
+        headers = {**self.HEADERS, "telegram-data": self.token}
+        try:
+            response = requests.get(f"{self.BASE_URL}{endpoint}", headers=headers, params=params)
+            if response.status_code == 200:
+                return response.json()
+            else:
+                self.log(f"❌ API request to {endpoint} failed: {response.text}", Fore.RED)
+                return None
+        except Exception as e:
+            self.log(f"❌ Exception during API request: {str(e)}", Fore.RED)
+            return None
 
     def build_graph(self, data):
+        """
+        Build the graph and item dictionaries from the map data.
+        """
         graph = {}
         items = {}
         for item in data:
@@ -585,52 +715,152 @@ class coinhunter:
             items[item["name"]] = item["items"]
         return graph, items
 
-    def find_closest_item(self, graph, items, start_name, target_item):
-        queue = deque([(start_name, [start_name])])
+    def check_backpack(self, item_name, required_quantity):
+        """
+        Check if the backpack contains the required quantity of an item.
+        """
+        response = self.api_request("backpack")
+        if not response or not response.get("ok"):
+            self.log(f"❌ Failed to retrieve backpack data.", Fore.RED)
+            return False
+
+        backpack_items = response.get("result", [])
+        item_count = sum(1 for item in backpack_items if item["iconName"] == item_name)
+        return item_count >= required_quantity
+
+    def check_weapon(self, weapon_name, required_level):
+        """
+        Check if the required weapon is available at the required level.
+        """
+        response = self.api_request("craft/WEAPONS")
+        if not response or not response.get("ok"):
+            self.log(f"❌ Failed to retrieve weapons data.", Fore.RED)
+            return False
+
+        weapons = response.get("result", [])
+        for weapon in weapons:
+            if (
+                weapon["name"] == weapon_name
+                and weapon["isUserOwn"]
+                and weapon["level"] >= required_level
+            ):
+                return True
+        return False
+
+    def find_all_locations_with_item(self, graph, items, current_location, target_item):
+        """
+        Find all locations where the target item can be farmed and return the paths to those locations.
+        """
+        from collections import deque
+
         visited = set()
+        queue = deque([(current_location, [])])
+        locations_with_item = []
 
         while queue:
-            current, path = queue.popleft()
-            if current in visited:
+            location, path = queue.popleft()
+
+            if location in visited:
                 continue
-            visited.add(current)
+            visited.add(location)
 
-            if target_item in items[current]:
-                return current, path
+            current_path = path + [location]
 
-            for neighbor in graph[current]:
+            if target_item in items.get(location, {}):
+                locations_with_item.append((location, current_path))
+
+            for neighbor in graph.get(location, []):
                 if neighbor not in visited:
-                    queue.append((neighbor, path + [neighbor]))
+                    queue.append((neighbor, current_path))
 
-        return None, []
+        return locations_with_item
+
+    def find_best_map_for_item_with_graph(
+        self, graph, items, current_location, target_item, required_quantity
+    ):
+        """
+        Find the best map for farming the target item based on the highest drop chance and graph navigation.
+        """
+        best_location = None
+        best_path = []
+        best_chance = 0
+        shortest_distance = float("inf")
+
+        locations_with_item = self.find_all_locations_with_item(
+            graph, items, current_location, target_item
+        )
+
+        for location, path in locations_with_item:
+            response = self.api_request(f"map/{location}")
+            if not response or not response.get("ok"):
+                self.log(f"❌ Failed to retrieve map data for '{location}'.", Fore.RED)
+                continue
+
+            map_info = response["result"]
+            drop_items = map_info.get("drop", [])
+            requirements = map_info.get("require", [])
+
+            available_chance = 0
+            for drop_item in drop_items:
+                if drop_item["iconName"] == target_item:
+                    available_chance = drop_item["chance"]
+
+            unmet_requirements = []
+            for req in requirements:
+                if req["type"] == "weapon":
+                    if not self.check_weapon(req["name"], req["level"]):
+                        unmet_requirements.append(req)
+                elif req["type"] == "item":
+                    if not self.check_backpack(req["itemName"], req["amount"]):
+                        unmet_requirements.append(req)
+
+            if unmet_requirements:
+                self.log(
+                    f"🚫 Location '{location}' skipped due to unmet requirements: {unmet_requirements}.",
+                    Fore.RED,
+                )
+                continue
+
+            if available_chance > best_chance or (
+                available_chance == best_chance and len(path) < shortest_distance
+            ):
+                best_location = location
+                best_path = path
+                best_chance = available_chance
+                shortest_distance = len(path)
+
+        return best_location, best_path, best_chance
 
     def map(self):
         """
         Manage the flow to search for materials, validate locations, and start farming.
         """
+        graph, items = self.build_graph(self.MAP)
 
-        # Retrieve crafting data
         craft_data = self.craft(info=True)
         if not craft_data:
-            self.log("❌ Crafting data is invalid or empty. Please check the input.", Fore.RED)
+            self.log(
+                "❌ Crafting data is invalid or empty. Please check the input.",
+                Fore.RED,
+            )
             return
 
-        # Consolidate required items by name
         item_counts = {}
         for item in craft_data:
             name = item["iconName"]
             item_counts[name] = item_counts.get(name, 0) + 1
 
-        required_items = [{"name": name, "quantity": quantity} for name, quantity in item_counts.items()]
+        required_items = [
+            {"name": name, "quantity": quantity}
+            for name, quantity in item_counts.items()
+        ]
         self.log(f"📝 Items required: {required_items}", Fore.YELLOW)
 
-        # Check items in the backpack
         missing_items = []
         for required_item in required_items:
             item_name = required_item["name"]
             required_quantity = required_item["quantity"]
 
-            # Use check_backpack to validate quantities
             if not self.check_backpack(item_name, required_quantity):
                 self.log(
                     f"⚠️ Item '{item_name}' is insufficient ({required_quantity} required).",
@@ -638,57 +868,40 @@ class coinhunter:
                 )
                 missing_items.append(required_item)
             else:
-                self.log(f"✅ Item '{item_name}' is available in sufficient quantity.", Fore.GREEN)
-
-        # Stop process if all items are already sufficient
-        if not missing_items:
-            self.log("🎉 All required items are already available in the backpack.", Fore.GREEN)
-            return
-
-        # Build navigation graph
-        graph, items = self.build_graph(self.MAP)
-
-        # Find the closest missing item
-        closest_item = None
-        shortest_distance = float("inf")
-
-        for target_item in missing_items:
-            location, path = self.find_closest_item(
-                graph, items, self.location, target_item["name"]
-            )
-            if location:
-                distance = len(path)
-                if distance < shortest_distance:
-                    closest_item = target_item
-                    shortest_distance = distance
-
-        # Start farming or move to a new location
-        if closest_item:
-            self.log(
-                f"🔍 Searching for item '{closest_item['name']}' that is still insufficient...",
-                Fore.YELLOW,
-            )
-            location, path = self.find_closest_item(
-                graph, items, self.location, closest_item["name"]
-            )
-
-            if location:
                 self.log(
-                    f"📍 Item '{closest_item['name']}' found at location '{location}' with path: {path}",
+                    f"✅ Item '{item_name}' is available in sufficient quantity.",
                     Fore.GREEN,
                 )
 
-                if location == self.location:
-                    self.start_farming(location)
-                else:
-                    next_location = path[1] if len(path) > 1 else location
-                    self.log(
-                        f"➡️ Moving to location '{next_location}' to search for item '{closest_item['name']}'.",
-                        Fore.YELLOW,
-                    )
-                    self.start_farming(next_location)
-        else:
-            self.log("🚫 No items found on the map. Please check the configuration.", Fore.RED)
+        if not missing_items:
+            self.log(
+                "🎉 All required items are already available in the backpack.",
+                Fore.GREEN,
+            )
+            return
+
+        for missing_item in missing_items:
+            item_name = missing_item["name"]
+            required_quantity = missing_item["quantity"]
+
+            best_location, best_path, best_chance = (
+                self.find_best_map_for_item_with_graph(
+                    graph, items, self.location, item_name, required_quantity
+                )
+            )
+
+            if best_location:
+                self.log(
+                    f"📍 Best location found: '{best_location}' with {best_chance:.2f}% chance for item '{item_name}'. Path: {best_path}",
+                    Fore.GREEN,
+                )
+                next_location = best_path[1] if len(best_path) > 1 else best_location
+                self.start_farming(next_location)
+            else:
+                self.log(
+                    f"🚫 No suitable location found for item '{item_name}'. Please check the map or item availability.",
+                    Fore.RED,
+                )
 
     def start_farming(self, location):
         """
@@ -746,7 +959,9 @@ class coinhunter:
             if backpack_data.get("ok"):
                 # Count occurrences of the item in the backpack
                 items_in_backpack = backpack_data.get("result", [])
-                item_count = sum(1 for item in items_in_backpack if item.get("iconName") == item_name)
+                item_count = sum(
+                    1 for item in items_in_backpack if item.get("iconName") == item_name
+                )
 
                 # Check if the count meets the required quantity
                 if item_count >= required_quantity:
@@ -773,106 +988,85 @@ class coinhunter:
 
     def craft(self, info=True):
         """
-        Manage crafting flow, including checking item levels and crafting requirements.
+        Manage crafting flow based on slot capacity and prioritize backpack.
         """
+        weapons_url = f"{self.BASE_URL}craft/WEAPONS"
         craft_url = f"{self.BASE_URL}craft/CRAFT_ITEMS"
         legendary_url = f"{self.BASE_URL}craft/LEGENDARY_ITEMS"
-        potions_url = f"{self.BASE_URL}craft/POTIONS"
-        weapons_url = f"{self.BASE_URL}craft/WEAPONS"
         headers = {**self.HEADERS, "telegram-data": self.token}
 
         try:
-            # Fetch data from APIs
+            weapons_data = requests.get(weapons_url, headers=headers).json()
             craft_data = requests.get(craft_url, headers=headers).json()
             legendary_data = requests.get(legendary_url, headers=headers).json()
-            potions_data = requests.get(potions_url, headers=headers).json()
-            weapons_data = requests.get(weapons_url, headers=headers).json()
 
-            if not craft_data.get("ok"):
-                raise ValueError("❌ Failed to fetch data from CRAFT_ITEMS API.")
-            if not legendary_data.get("ok"):
-                raise ValueError("❌ Failed to fetch data from LEGENDARY_ITEMS API.")
-            if not potions_data.get("ok"):
-                raise ValueError("❌ Failed to fetch data from POTIONS API.")
-            if not weapons_data.get("ok"):
-                raise ValueError("❌ Failed to fetch data from WEAPONS API.")
+            if (
+                not weapons_data.get("ok")
+                or not craft_data.get("ok")
+                or not legendary_data.get("ok")
+            ):
+                raise ValueError("❌ Failed to fetch data from APIs.")
 
-            craft_result = craft_data.get("result", [])
-            legendary_map = {item["name"]: item for item in legendary_data.get("result", [])}
+            weapons = weapons_data["result"]
+            crafts = craft_data["result"]
+            legendary_map = {item["name"]: item for item in legendary_data["result"]}
 
-            # Process CRAFT_ITEMS
-            for item in craft_result:
-                if item["level"] < 8:
+            # Initialize slot capacity
+            slot_capacity = 3
+            for item in crafts:
+                if item["name"] == "backpack" and item["isUserOwn"]:
+                    slot_capacity += item.get("reduce", 0)
+
+            # Check if backpack is owned
+            for item in crafts:
+                if item["name"] == "backpack" and not item["isUserOwn"]:
                     if info:
                         self.log(
-                            f"⚠️ Item '{item['name']}' is level {item['level']}. Upgrade to level 8 required.",
+                            f"⚠️ Crafting 'backpack' to increase slot capacity.",
                             Fore.YELLOW,
                         )
-                        self.name_craft = item["name"]
+                    crafting_items = item["items"]
+                    return self.craft_items(crafting_items, legendary_map)
 
-                    crafting_items = item.get("items", [])
-                    for crafting_material in crafting_items:
-                        icon_name = crafting_material["iconName"]
-
-                        if icon_name in legendary_map:
-                            legendary_recipe = legendary_map[icon_name]
-                            if info:
-                                self.log(
-                                    f"🔧 Material '{icon_name}' required for '{item['name']}'. Crafting via LEGENDARY_ITEMS: '{legendary_recipe['name']}'.",
-                                    Fore.CYAN,
-                                )
-                                self.type_craft = "LEGENDARY_ITEMS"
-                            return legendary_recipe["items"]
-
-                        self.type_craft = "CRAFT_ITEMS"
-                    return crafting_items
-                else:
+            # Prioritize crafting items within slot capacity
+            for item in crafts:
+                if item["level"] < 8 and len(item["items"]) <= slot_capacity:
                     if info:
                         self.log(
-                            f"✅ Item '{item['name']}' meets the requirements (Level {item['level']}).",
-                            Fore.GREEN,
+                            f"⚠️ Crafting '{item['name']}' to level up (current level: {item['level']}).",
+                            Fore.CYAN,
                         )
-                    return item
+                    crafting_items = item["items"]
+                    return self.craft_items(crafting_items, legendary_map)
+
+            # Check fishing_rod crafting
+            for weapon in weapons:
+                if weapon["name"] == "fishing_rod" and not weapon["isUserOwn"]:
+                    if len(weapon["items"]) <= slot_capacity:
+                        if info:
+                            self.log(
+                                f"⚠️ Crafting 'fishing_rod' (slots required: {len(weapon['items'])}).",
+                                Fore.CYAN,
+                            )
+                        crafting_items = weapon["items"]
+                        return self.craft_items(crafting_items, legendary_map)
+
+            # Check vaporizer crafting
+            for weapon in weapons:
+                if weapon["name"] == "vaporizer" and not weapon["isUserOwn"]:
+                    if len(weapon["items"]) <= slot_capacity:
+                        if info:
+                            self.log(
+                                f"⚠️ Crafting 'vaporizer' (slots required: {len(weapon['items'])}).",
+                                Fore.CYAN,
+                            )
+                        crafting_items = weapon["items"]
+                        return self.craft_items(crafting_items, legendary_map)
 
             if info:
-                self.log("🎉 All CRAFT_ITEMS are at level 8. Proceeding to WEAPONS.", Fore.CYAN)
-
-            # Process WEAPONS
-            for weapon in weapons_data.get("result", []):
-                if weapon["name"] == "vaporizer" and weapon["level"] < 8:
-                    if info:
-                        self.log(
-                            f"⚠️ Weapon '{weapon['name']}' is level {weapon['level']}. Upgrade to level 8 required.",
-                            Fore.YELLOW,
-                        )
-                        self.name_craft = weapon["name"]
-
-                    crafting_items = weapon.get("items", [])
-                    for crafting_material in crafting_items:
-                        icon_name = crafting_material["iconName"]
-
-                        if icon_name in legendary_map:
-                            legendary_recipe = legendary_map[icon_name]
-                            if info:
-                                self.log(
-                                    f"🔧 Material '{icon_name}' required for '{weapon['name']}'. Crafting via LEGENDARY_ITEMS: '{legendary_recipe['name']}'.",
-                                    Fore.CYAN,
-                                )
-                                self.type_craft = "LEGENDARY_ITEMS"
-                            return legendary_recipe["items"]
-
-                        self.type_craft = "WEAPONS"
-                    return crafting_items
-
-            if info:
-                self.log("🎉 All WEAPONS are complete. Proceeding to POTIONS.", Fore.CYAN)
-
-            # Process POTIONS
-            for potion in potions_data.get("result", []):
-                if info:
-                    self.log(f"🧪 Crafting '{potion['name']}' from POTIONS.", Fore.CYAN)
-                    self.type_craft = "POTIONS"
-                return potion["items"]
+                self.log(
+                    "🎉 All items are crafted or slots are insufficient.", Fore.GREEN
+                )
 
         except requests.RequestException as e:
             self.log(f"❌ API request failed: {e}", Fore.RED)
@@ -882,6 +1076,21 @@ class coinhunter:
             raise
         except Exception as e:
             self.log(f"❌ Unexpected error during crafting: {e}", Fore.RED)
+
+    def craft_items(self, items, legendary_map):
+        """
+        Handle crafting of items, checking for legendary item requirements.
+        """
+        for material in items:
+            icon_name = material["iconName"]
+            if icon_name in legendary_map:
+                legendary_recipe = legendary_map[icon_name]
+                self.log(
+                    f"🔧 Crafting material '{icon_name}' from LEGENDARY_ITEMS: '{legendary_recipe['name']}'.",
+                    Fore.CYAN,
+                )
+                return legendary_recipe["items"]
+        return items
 
     def info(self) -> None:
         req_url = f"{self.BASE_URL}user"
@@ -1077,7 +1286,10 @@ class coinhunter:
                 result = data.get("result", {}).get("code", [])
 
                 if all(result):
-                    self.log(f"🎉 Success! All combinations correct: {code_icons}", Fore.GREEN)
+                    self.log(
+                        f"🎉 Success! All combinations correct: {code_icons}",
+                        Fore.GREEN,
+                    )
                     info_url = f"{self.BASE_URL}chest"
                     info_res = requests.get(info_url, headers=headers)
                     if info_res.status_code == 200:
@@ -1099,10 +1311,14 @@ class coinhunter:
                                         icon_name = prize["iconName"]
                                         chance = prize["chance"]
 
-                                        required_quantity = item_counts.get(icon_name, 0)
+                                        required_quantity = item_counts.get(
+                                            icon_name, 0
+                                        )
 
                                         if required_quantity > 0:
-                                            if self.check_backpack(icon_name, required_quantity):
+                                            if self.check_backpack(
+                                                icon_name, required_quantity
+                                            ):
                                                 self.log(
                                                     f"✅ Item '{icon_name}' is sufficient in backpack ({required_quantity} required).",
                                                     Fore.GREEN,
@@ -1118,21 +1334,27 @@ class coinhunter:
                                                         f"✅ Item '{icon_name}' has a high chance ({chance}%), claiming chest.",
                                                         Fore.GREEN,
                                                     )
-                                                    claim_url = f"{self.BASE_URL}chest/open"
+                                                    claim_url = (
+                                                        f"{self.BASE_URL}chest/open"
+                                                    )
                                                     claim_res = requests.post(
                                                         claim_url, headers=headers
                                                     )
                                                     if claim_res.status_code == 200:
                                                         try:
-                                                            check_data = claim_res.json()
+                                                            check_data = (
+                                                                claim_res.json()
+                                                            )
                                                             if (
                                                                 check_data.get("ok")
-                                                                and "result" in check_data
+                                                                and "result"
+                                                                in check_data
                                                             ):
                                                                 item_name = check_data[
                                                                     "result"
                                                                 ].get(
-                                                                    "item", "Unknown item"
+                                                                    "item",
+                                                                    "Unknown item",
                                                                 )
                                                                 self.log(
                                                                     f"🎁 Chest opened successfully! Item obtained: {item_name}",
@@ -1150,8 +1372,11 @@ class coinhunter:
                                                             )
                                                     else:
                                                         try:
-                                                            error_message = claim_res.json().get(
-                                                                "errorCode", "Unknown error"
+                                                            error_message = (
+                                                                claim_res.json().get(
+                                                                    "errorCode",
+                                                                    "Unknown error",
+                                                                )
                                                             )
                                                         except ValueError:
                                                             error_message = "Server response could not be processed."
@@ -1168,14 +1393,19 @@ class coinhunter:
                                             )
                                 else:
                                     self.log(
-                                        "❌ Failed to fetch crafting data or data is empty.", Fore.RED
+                                        "❌ Failed to fetch crafting data or data is empty.",
+                                        Fore.RED,
                                     )
                         except ValueError:
                             self.log(
-                                f"❌ Failed to process JSON response from server.", Fore.RED
+                                f"❌ Failed to process JSON response from server.",
+                                Fore.RED,
                             )
                     else:
-                        self.log("❌ Failed to fetch crafting data or data is empty.", Fore.RED)
+                        self.log(
+                            "❌ Failed to fetch crafting data or data is empty.",
+                            Fore.RED,
+                        )
                 else:
                     self.log(f"❌ Incorrect combination: {code_icons}", Fore.RED)
 
@@ -1211,7 +1441,9 @@ class coinhunter:
                                     required_quantity = item_counts.get(icon_name, 0)
 
                                     if required_quantity > 0:
-                                        if self.check_backpack(icon_name, required_quantity):
+                                        if self.check_backpack(
+                                            icon_name, required_quantity
+                                        ):
                                             self.log(
                                                 f"✅ Item '{icon_name}' is sufficient in backpack ({required_quantity} required).",
                                                 Fore.GREEN,
@@ -1259,8 +1491,11 @@ class coinhunter:
                                                         )
                                                 else:
                                                     try:
-                                                        error_message = claim_res.json().get(
-                                                            "errorCode", "Unknown error"
+                                                        error_message = (
+                                                            claim_res.json().get(
+                                                                "errorCode",
+                                                                "Unknown error",
+                                                            )
                                                         )
                                                     except ValueError:
                                                         error_message = "Server response could not be processed."
@@ -1277,12 +1512,17 @@ class coinhunter:
                                         )
                             else:
                                 self.log(
-                                    "❌ Failed to fetch crafting data or data is empty.", Fore.RED
+                                    "❌ Failed to fetch crafting data or data is empty.",
+                                    Fore.RED,
                                 )
                     except ValueError:
-                        self.log(f"❌ Failed to process JSON response from server.", Fore.RED)
+                        self.log(
+                            f"❌ Failed to process JSON response from server.", Fore.RED
+                        )
                 else:
-                    self.log("❌ Failed to fetch crafting data or data is empty.", Fore.RED)
+                    self.log(
+                        "❌ Failed to fetch crafting data or data is empty.", Fore.RED
+                    )
                 break
             except ValueError as e:
                 self.log(f"⚠️ Data error: {e}", Fore.RED)
@@ -1322,86 +1562,56 @@ if __name__ == "__main__":
     max_index = len(chunter.query_list)
     config = chunter.load_config()
 
+    chunter.log("🎉 [LIVEXORDS] === Welcome to CoinHunter Automation === [LIVEXORDS]", Fore.YELLOW)
+    chunter.log(f"📂 Loaded {max_index} accounts from query list.", Fore.YELLOW)
+
     while True:
-        # Display current progress
-        chunter.log(
-            f"{Fore.GREEN}[LIVEXORDS]===== {index + 1}/{max_index} =====[LIVEXORDS]{Fore.RESET}"
+        # Display current account info
+        current_account = chunter.query_list[index]
+        display_account = (
+            current_account[:10] + "..." if len(current_account) > 10 else current_account
         )
+        chunter.log(f"👤 [ACCOUNT] Processing account {index + 1}/{max_index}: {display_account}", Fore.YELLOW)
+
         chunter.login(index)
 
-        # Daily Task
-        if config.get("daily", False):
-            chunter.log(f"{Fore.YELLOW}[CONFIG] daily: ✅ Enabled{Fore.RESET}")
-            chunter.daily()
-        else:
-            chunter.log(f"{Fore.RED}[CONFIG] daily: ❌ Disabled{Fore.RESET}")
+        # Task execution
+        chunter.log("🛠️ Starting task execution...")
+        tasks = {
+            "daily": "🌞 Daily Task",
+            "upgrade": "🔧 Upgrade Task",
+            "wheel": "🎡 Spin the Wheel",
+            "farm": "🌾 Farming Resources",
+            "mission": "🚀 Mission Progress",
+            "tasks": "📋 General Tasks",
+            "chest": "💼 Chest Collection",
+            "reff": "🤝 Referral Program",
+        }
 
-        # Upgrade Task
-        if config.get("upgrade", False):
-            chunter.log(f"{Fore.YELLOW}[CONFIG] upgrade: ✅ Enabled{Fore.RESET}")
-            chunter.upgrade()
-        else:
-            chunter.log(f"{Fore.RED}[CONFIG] upgrade: ❌ Disabled{Fore.RESET}")
+        for task_key, task_name in tasks.items():
+            task_status = config.get(task_key, False)
+            chunter.log(
+                f"[CONFIG] {task_name}: {'✅ Enabled' if task_status else '❌ Disabled'}",
+                Fore.YELLOW if task_status else Fore.RED,
+            )
 
-        # Wheel Task
-        if config.get("wheel", False):
-            chunter.log(f"{Fore.YELLOW}[CONFIG] wheel: ✅ Enabled{Fore.RESET}")
-            chunter.wheel()
-        else:
-            chunter.log(f"{Fore.RED}[CONFIG] wheel: ❌ Disabled{Fore.RESET}")
-
-        # Farming Task
-        if config.get("farm", False):
-            chunter.log(f"{Fore.YELLOW}[CONFIG] farm: ✅ Enabled{Fore.RESET}")
-            chunter.farm()
-        else:
-            chunter.log(f"{Fore.RED}[CONFIG] farm: ❌ Disabled{Fore.RESET}")
-
-        # Mission Task
-        if config.get("mission", False):
-            chunter.log(f"{Fore.YELLOW}[CONFIG] mission: ✅ Enabled{Fore.RESET}")
-            chunter.mission()
-        else:
-            chunter.log(f"{Fore.RED}[CONFIG] mission: ❌ Disabled{Fore.RESET}")
-
-        # Tasks Task
-        if config.get("tasks", False):
-            chunter.log(f"{Fore.YELLOW}[CONFIG] tasks: ✅ Enabled{Fore.RESET}")
-            chunter.tasks()
-        else:
-            chunter.log(f"{Fore.RED}[CONFIG] tasks: ❌ Disabled{Fore.RESET}")
-
-        # Chest Task
-        if config.get("chest", False):
-            chunter.log(f"{Fore.YELLOW}[CONFIG] chest: ✅ Enabled{Fore.RESET}")
-            chunter.chest()
-        else:
-            chunter.log(f"{Fore.RED}[CONFIG] chest: ❌ Disabled{Fore.RESET}")
-
-        # Referral Task
-        if config.get("reff", False):
-            chunter.log(f"{Fore.YELLOW}[CONFIG] reff: ✅ Enabled{Fore.RESET}")
-            chunter.reff()
-        else:
-            chunter.log(f"{Fore.RED}[CONFIG] reff: ❌ Disabled{Fore.RESET}")
-
-        # Upgrade Task (Again)
-        if config.get("upgrade", False):
-            chunter.log(f"{Fore.YELLOW}[CONFIG] upgrade: ✅ Enabled{Fore.RESET}")
-            chunter.upgrade()
-        else:
-            chunter.log(f"{Fore.RED}[CONFIG] upgrade: ❌ Disabled{Fore.RESET}")
+            if task_status:
+                chunter.log(f"🔄 Executing {task_name}...")
+                getattr(chunter, task_key)()
 
         # Loop Control
         if index == max_index - 1:
-            chunter.log(f"⏳ Pausing for the next loop...", Fore.CYAN)
-            chunter.log(f"💤 Sleeping for {config.get('delay_loop')} seconds...", Fore.CYAN)
-            time.sleep(config.get("delay_loop"))
+            chunter.log("🔁 All accounts processed. Restarting loop.", Fore.CYAN)
+            chunter.log(
+                f"⏳ Sleeping for {config.get('delay_loop', 30)} seconds before restarting.",
+                Fore.CYAN,
+            )
+            time.sleep(config.get("delay_loop", 30))
             index = 0
         else:
             chunter.log(
-                f"💤 Sleeping for {config.get('delay_account_switch')} seconds before moving to the next account...",
-                Fore.CYAN
+                f"➡️ Switching to the next account in {config.get('delay_account_switch', 10)} seconds.",
+                Fore.CYAN,
             )
-            time.sleep(config.get("delay_account_switch"))
+            time.sleep(config.get("delay_account_switch", 10))
             index += 1
