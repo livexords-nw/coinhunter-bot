@@ -22,12 +22,12 @@ With this bot, you can save time while maximizing your results without manual in
 
 ---
 
-## 🌟 **Version v1.7.7**
+## 🌟 **Version v1.7.8**  
 
-### **Updates in This Version**:
+### **Updates in This Version**:  
 
-1. Addition of blue maps, fishing spots, and required crafting items are now prioritized based on the map with the highest drop rate percentage, not just the closest one.
-2. Upgrade patterns have been improved for better optimization.
+1. **Bug Fixes**:  
+   - Fixed an issue in the **crafting system**: If the item to be crafted already has a level greater than 0, it will now be treated as an **upgrade** instead of crafting a new item.  
 
 ---
 

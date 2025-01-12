@@ -220,6 +220,7 @@ class coinhunter:
         self.location = None
         self.name_craft = None
         self.type_craft = None
+        self.level_item_craft = 0
 
     def banner(self) -> None:
         """Displays the banner for the bot."""
@@ -473,28 +474,51 @@ class coinhunter:
                             )
 
                     while True:
-                        post_response = requests.post(
-                            f"{self.BASE_URL}craft/{self.type_craft}/{self.name_craft}",
-                            headers=headers,
-                        )
-                        if post_response.status_code == 200:
-                            self.log(
-                                f"🎉 Successfully crafted {self.name_craft}.",
-                                Fore.GREEN,
+                        if self.level_item_craft > 0:
+                            post_response = requests.post(
+                                f"{self.BASE_URL}craft/{self.type_craft}/{self.name_craft}/upgrade",
+                                headers=headers,
                             )
-                            break
-                        elif post_response.status_code == 400:
-                            error_code = post_response.json().get(
-                                "errorCode", "Unknown Error"
-                            )
-                            self.log(
-                                f"❌ Crafting {self.name_craft} failed with message: {error_code}. Retrying...",
-                                Fore.RED,
-                            )
-                            time.sleep(3)
+                            if post_response.status_code == 200:
+                                self.log(
+                                    f"🎉 Successfully upgrade {self.name_craft}.",
+                                    Fore.GREEN,
+                                )
+                                break
+                            elif post_response.status_code == 400:
+                                error_code = post_response.json().get(
+                                    "errorCode", "Unknown Error"
+                                )
+                                self.log(
+                                    f"❌ Crafting {self.name_craft} failed with message: {error_code}. Retrying...",
+                                    Fore.RED,
+                                )
+                                time.sleep(3)
+                            else:
+                                post_response.raise_for_status()
                         else:
-                            post_response.raise_for_status()
-                    return
+                            post_response = requests.post(
+                                f"{self.BASE_URL}craft/{self.type_craft}/{self.name_craft}",
+                                headers=headers,
+                            )
+                            if post_response.status_code == 200:
+                                self.log(
+                                    f"🎉 Successfully crafted {self.name_craft}.",
+                                    Fore.GREEN,
+                                )
+                                break
+                            elif post_response.status_code == 400:
+                                error_code = post_response.json().get(
+                                    "errorCode", "Unknown Error"
+                                )
+                                self.log(
+                                    f"❌ Crafting {self.name_craft} failed with message: {error_code}. Retrying...",
+                                    Fore.RED,
+                                )
+                                time.sleep(3)
+                            else:
+                                post_response.raise_for_status()
+                        return
 
                 response = requests.get(req_url, headers=headers)
                 response.raise_for_status()
@@ -1020,6 +1044,9 @@ class coinhunter:
             # Check if backpack is owned
             for item in crafts:
                 if item["name"] == "backpack" and not item["isUserOwn"]:
+                    self.name_craft = item["name"]
+                    self.type_craft = "CRAFT_ITEMS"
+                    self.level_item_craft = item["level"]
                     if info:
                         self.log(
                             f"⚠️ Crafting 'backpack' to increase slot capacity.",
@@ -1031,6 +1058,9 @@ class coinhunter:
             # Prioritize crafting items within slot capacity
             for item in crafts:
                 if item["level"] < 8 and len(item["items"]) <= slot_capacity:
+                    self.name_craft = item["name"]
+                    self.type_craft = "CRAFT_ITEMS"
+                    self.level_item_craft = item["level"]
                     if info:
                         self.log(
                             f"⚠️ Crafting '{item['name']}' to level up (current level: {item['level']}).",
@@ -1042,6 +1072,9 @@ class coinhunter:
             # Check fishing_rod crafting
             for weapon in weapons:
                 if weapon["name"] == "fishing_rod" and not weapon["isUserOwn"]:
+                    self.name_craft = weapon["name"]
+                    self.type_craft = "WEAPONS"
+                    self.level_item_craft = weapon["level"]
                     if len(weapon["items"]) <= slot_capacity:
                         if info:
                             self.log(
@@ -1054,6 +1087,9 @@ class coinhunter:
             # Check vaporizer crafting
             for weapon in weapons:
                 if weapon["name"] == "vaporizer" and not weapon["isUserOwn"]:
+                    self.name_craft = weapon["name"]
+                    self.type_craft = "WEAPONS"
+                    self.level_item_craft = weapon["level"]
                     if len(weapon["items"]) <= slot_capacity:
                         if info:
                             self.log(
@@ -1085,6 +1121,8 @@ class coinhunter:
             icon_name = material["iconName"]
             if icon_name in legendary_map:
                 legendary_recipe = legendary_map[icon_name]
+                self.name_craft = legendary_recipe["name"]
+                self.type_craft = "LEGENDARY_ITEMS"
                 self.log(
                     f"🔧 Crafting material '{icon_name}' from LEGENDARY_ITEMS: '{legendary_recipe['name']}'.",
                     Fore.CYAN,
