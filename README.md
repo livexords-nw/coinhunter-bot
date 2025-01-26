@@ -1,4 +1,5 @@
 ---
+
 <h1 align="center">Coin Hunter Bot</h1>
 
 <p align="center">Automate tasks in Coin Hunter to increase your efficiency and results!</p>
@@ -22,12 +23,17 @@ With this bot, you can save time while maximizing your results without manual in
 
 ---
 
-## 🌟 **Version v1.7.8**  
+## 🌟 **Version Beta v1.7.9**
 
-### **Updates in This Version**:  
+### **Updates in This Version**:
 
-1. **Bug Fixes**:  
-   - Fixed an issue in the **crafting system**: If the item to be crafted already has a level greater than 0, it will now be treated as an **upgrade** instead of crafting a new item.  
+1. **New Features**:
+   - **Enhanced Crafting System**: Added a more complex crafting system, now including **legendary items** with unique recipes and materials.
+
+### **Known Issues**:
+
+- **Chest Feature Disabled**: The chest feature has been temporarily disabled as it is not yet integrated into the system.
+- **Auto-Upgrade Feature**: Apologies for any bugs with the auto-upgrade feature. We're working on resolving the issues, but it may not function as expected at this time.
 
 ---
 
@@ -41,7 +47,7 @@ With this bot, you can save time while maximizing your results without manual in
 | `mission`              | Automatically complete missions             | `True`      |
 | `upgrade`              | Automatically upgrade item levels           | `True`      |
 | `tasks`                | Automatically complete tasks                | `True`      |
-| `chest`                | Automatically solve chest puzzles and claim | `True`      |
+| `chest`                | Automatically solve chest puzzles and claim | `False`     |
 | `reff`                 | Automatically claim referral points         | `True`      |
 | `delay_account_switch` | Delay before switching accounts             | `10`        |
 | `delay_loop`           | Delay before looping again                  | `3000`      |

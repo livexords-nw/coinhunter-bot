@@ -207,6 +207,204 @@ class coinhunter:
         },
     ]
 
+    LEGENDARY_ITEMS_LIST = [
+        {
+            "alias": "metal-box-legendary",
+            "name": "metal-box",
+            "price": 20000000,
+            "items": [
+                {"iconName": "iron-bar", "type": "uncommon", "name": "Iron Bar", "level": 8},
+                {"iconName": "iron-bar", "type": "uncommon", "name": "Iron Bar", "level": 8},
+                {"iconName": "screw", "type": "rare", "name": "Screw", "level": 8},
+                {"iconName": "bolt", "type": "rare", "name": "Bolt", "level": 8},
+            ],
+        },
+        {
+            "alias": "silver-box-legendary",
+            "name": "silver-box",
+            "price": 20000000,
+            "items": [
+                {"iconName": "silver-bar", "type": "rare", "name": "Silver Bar", "level": 8},
+                {"iconName": "silver-bar", "type": "rare", "name": "Silver Bar", "level": 8},
+                {"iconName": "screw", "type": "rare", "name": "Screw", "level": 8},
+                {"iconName": "bolt", "type": "rare", "name": "Bolt", "level": 8},
+            ],
+        },
+        {
+            "alias": "gold-box-legendary",
+            "name": "gold-box",
+            "price": 20000000,
+            "items": [
+                {"iconName": "pirates-gold", "type": "epic", "name": "Pirates Gold", "level": 8},
+                {"iconName": "pirates-gold", "type": "epic", "name": "Pirates Gold", "level": 8},
+                {"iconName": "screw", "type": "rare", "name": "Screw", "level": 8},
+                {"iconName": "bolt", "type": "rare", "name": "Bolt", "level": 8},
+            ],
+        },
+        {
+            "alias": "chemicals-legendary",
+            "name": "chemicals-legendary",
+            "price": 20000000,
+            "items": [
+                {"iconName": "metal-box", "type": "legendary", "name": "Metal Box", "level": 8},
+                {"iconName": "chemicals", "type": "uncommon", "name": "Chemicals", "level": 8},
+            ],
+        },
+        {
+            "alias": "zombie-blood-legendary",
+            "name": "zombie-blood-legendary",
+            "price": 20000000,
+            "items": [
+                {"iconName": "metal-box", "type": "legendary", "name": "Metal Box", "level": 8},
+                {"iconName": "zombie-blood", "type": "uncommon", "name": "Zombie Blood", "level": 8},
+            ],
+        },
+        {
+            "alias": "gasoline-legendary",
+            "name": "gasoline-legendary",
+            "price": 20000000,
+            "items": [
+                {"iconName": "metal-box", "type": "legendary", "name": "Metal Box", "level": 8},
+                {"iconName": "gasoline", "type": "uncommon", "name": "Gasoline", "level": 8},
+            ],
+        },
+        {
+            "alias": "rubber-legendary",
+            "name": "rubber-legendary",
+            "price": 20000000,
+            "items": [
+                {"iconName": "metal-box", "type": "legendary", "name": "Metal Box", "level": 8},
+                {"iconName": "rubber", "type": "uncommon", "name": "Rubber", "level": 8},
+            ],
+        },
+        {
+            "alias": "hammer-legendary",
+            "name": "hammer-legendary",
+            "price": 20000000,
+            "items": [
+                {"iconName": "silver-box", "type": "legendary", "name": "Silver Box", "level": 8},
+                {"iconName": "hammer", "type": "rare", "name": "Hammer", "level": 8},
+            ],
+        },
+        {
+            "alias": "screw-legendary",
+            "name": "screw-legendary",
+            "price": 20000000,
+            "items": [
+                {"iconName": "silver-box", "type": "legendary", "name": "Silver Box", "level": 8},
+                {"iconName": "screw", "type": "rare", "name": "Screw", "level": 8},
+            ],
+        },
+        {
+            "alias": "glass-legendary",
+            "name": "glass-legendary",
+            "price": 20000000,
+            "items": [
+                {"iconName": "silver-box", "type": "legendary", "name": "Silver Box", "level": 8},
+                {"iconName": "glass", "type": "rare", "name": "Glass", "level": 8},
+            ],
+        },
+        {
+            "alias": "rope-legendary",
+            "name": "rope-legendary",
+            "price": 20000000,
+            "items": [
+                {"iconName": "metal-box", "type": "legendary", "name": "Metal Box", "level": 8},
+                {"iconName": "rope", "type": "uncommon", "name": "Rope", "level": 8},
+            ],
+        },
+        {
+            "alias": "dirty-textile-legendary",
+            "name": "dirty-textile-legendary",
+            "price": 20000000,
+            "items": [
+                {"iconName": "metal-box", "type": "legendary", "name": "Metal Box", "level": 8},
+                {"iconName": "dirty-textile", "type": "common", "name": "Dirty Textile", "level": 8},
+            ],
+        },
+        {
+            "alias": "copper-wire-legendary",
+            "name": "copper-wire-legendary",
+            "price": 20000000,
+            "items": [
+                {"iconName": "metal-box", "type": "legendary", "name": "Metal Box", "level": 8},
+                {"iconName": "copper-wire", "type": "uncommon", "name": "Copper Wire", "level": 8},
+            ],
+        },
+        {
+            "alias": "microchip-legendary",
+            "name": "microchip-legendary",
+            "price": 20000000,
+            "items": [
+                {"iconName": "gold-box", "type": "legendary", "name": "Gold Box", "level": 8},
+                {"iconName": "microchip", "type": "epic", "name": "Microchip", "level": 8},
+            ],
+        },
+        {
+            "alias": "plastic-bottle-legendary",
+            "name": "plastic-bottle-legendary",
+            "price": 20000000,
+            "items": [
+                {"iconName": "silver-box", "type": "legendary", "name": "Silver Box", "level": 8},
+                {"iconName": "plastic-bottle", "type": "uncommon", "name": "Plastic Bottle", "level": 8},
+            ],
+        },
+        {
+            "alias": "leather-legendary",
+            "name": "leather-legendary",
+            "price": 20000000,
+            "items": [
+                {"iconName": "metal-box", "type": "legendary", "name": "Metal Box", "level": 8},
+                {"iconName": "leather", "type": "uncommon", "name": "Leather", "level": 8},
+            ],
+        },
+        {
+            "alias": "wood-legendary",
+            "name": "wood-legendary",
+            "price": 20000000,
+            "items": [
+                {"iconName": "metal-box", "type": "legendary", "name": "Metal Box", "level": 8},
+                {"iconName": "wood", "type": "uncommon", "name": "Wood", "level": 8},
+            ],
+        },
+        {
+            "alias": "wrench-legendary",
+            "name": "wrench-legendary",
+            "price": 20000000,
+            "items": [
+                {"iconName": "gold-box", "type": "legendary", "name": "Gold Box", "level": 8},
+                {"iconName": "wrench", "type": "epic", "name": "Wrench", "level": 8},
+            ],
+        },
+        {
+            "alias": "super-glue-legendary",
+            "name": "super-glue-legendary",
+            "price": 20000000,
+            "items": [
+                {"iconName": "metal-box", "type": "legendary", "name": "Metal Box", "level": 8},
+                {"iconName": "super-glue", "type": "uncommon", "name": "Super Glue", "level": 8},
+            ],
+        },
+        {
+            "alias": "battery-legendary",
+            "name": "battery-legendary",
+            "price": 20000000,
+            "items": [
+                {"iconName": "gold-box", "type": "legendary", "name": "Gold Box", "level": 8},
+                {"iconName": "battery", "type": "epic", "name": "Battery", "level": 8},
+            ],
+        },
+        {
+            "alias": "bolt-legendary",
+            "name": "bolt-legendary",
+            "price": 20000000,
+            "items": [
+                {"iconName": "silver-box", "type": "legendary", "name": "Silver Box", "level": 8},
+                {"iconName": "bolt", "type": "rare", "name": "Bolt", "level": 8},
+            ],
+        },
+    ]
+
     ARROW_MAP = {"r": "➡️", "t": "⬆️", "b": "⬇️", "l": "⬅️"}
 
     def __init__(self):
@@ -215,12 +413,12 @@ class coinhunter:
         self.coin = 0
         self.ticket = 0
         self.power = 0
-        self.config = self.load_config()
         self.result = None
         self.location = None
         self.name_craft = None
         self.type_craft = None
         self.level_item_craft = 0
+        self.protected_items = []
 
     def banner(self) -> None:
         """Displays the banner for the bot."""
@@ -356,200 +554,187 @@ class coinhunter:
         """Manages backpack items by checking crafting, upgrading, and burning."""
         req_url = f"{self.BASE_URL}backpack"
         upgrade_url = f"{self.BASE_URL}backpack/upgrade"
+        upgrade_prices = self.get_upgrade_prices()
 
         headers = {**self.HEADERS, "telegram-data": self.token}
-        success = True
 
-        while success:
-            success = False
+        def search_missing_items(item_name, crafting_data, depth=1):
+            """
+            Traverse items down to their base materials, prioritizing legendary items.
+            If all materials are non-legendary and unavailable in the backpack, return the parent item name if all materials are available; otherwise, return None.
+            """
+            indent = "  " * depth
+            self.log(f"{indent}🔍 Checking item '{item_name}' (Depth: {depth})", Fore.MAGENTA)
 
-            try:
-                response = requests.get(req_url, headers=headers)
-                response.raise_for_status()
-                data = response.json()
+            # Check if the item is in the backpack
+            if self.check_backpack(item_name):
+                self.log(f"{indent}✅ Item '{item_name}' is already in the backpack.", Fore.CYAN)
+                return None
 
-                if not data or "result" not in data:
-                    raise ValueError("Data 'result' not found in the response.")
+            # If the item is legendary, process its materials
+            if item_name.endswith("-legendary"):
+                legendary_item = next((item for item in crafting_data if item["name"] == item_name), None)
+                if not legendary_item:
+                    # Search in LEGENDARY_ITEMS_LIST
+                    legendary_item = next((item for item in self.LEGENDARY_ITEMS_LIST if item["alias"] == item_name), None)
 
-                items = [
-                    {
-                        "id": item.get("id"),
-                        "iconName": item.get("iconName"),
-                        "level": item.get("level"),
-                        "type": item.get("type"),
-                    }
-                    for item in data.get("result", [])
-                ]
+                if legendary_item:
+                    self.log(f"{indent}📜 Found legendary item '{item_name}'. Checking its materials.", Fore.GREEN)
+                    materials_key = "materials" if "materials" in legendary_item else "items"
+                    all_available = True
+                    for material in legendary_item[materials_key]:
+                        if not self.check_backpack(material["name"]):
+                            missing = search_missing_items(material["name"], crafting_data, depth + 1)
+                            if missing:
+                                all_available = False
+                    return item_name if all_available else None
+                else:
+                    self.log(f"{indent}🚫 No recipe found for legendary item '{item_name}'.", Fore.RED)
+                    return None
 
-                if not items:
-                    self.log("⚠️ No items found in the backpack.", Fore.RED)
+            # Check non-legendary items
+            recipe = next((r for r in crafting_data if r["name"] == item_name), None)
+            if recipe and "materials" in recipe:
+                self.log(f"{indent}📜 Found recipe for '{item_name}'. Checking its materials.", Fore.GREEN)
+                all_available = True
+                for material in recipe["materials"]:
+                    # Check if material is in backpack
+                    if not self.check_backpack(material["name"]):
+                        if material["name"].endswith("-legendary"):
+                            self.log(f"{indent}📜 Material '{material['name']}' is legendary. Diving deeper.", Fore.BLUE)
+                            missing = search_missing_items(material["name"], crafting_data, depth + 1)
+                            if missing:
+                                all_available = False
+                        else:
+                            missing = search_missing_items(material["name"], crafting_data, depth + 1)
+                            if missing:
+                                all_available = False
+                return item_name if all_available else None
+            else:
+                self.log(f"{indent}🚫 No recipe found for '{item_name}', checking LEGENDARY_ITEMS_LIST.", Fore.YELLOW)
+                # Search in LEGENDARY_ITEMS_LIST
+                legendary_item = next((item for item in self.LEGENDARY_ITEMS_LIST if item["alias"] == item_name), None)
+                if legendary_item:
+                    self.log(f"{indent}📜 Found '{item_name}' in LEGENDARY_ITEMS_LIST. Checking its materials.", Fore.GREEN)
+                    all_available = True
+                    for material in legendary_item["items"]:
+                        if not self.check_backpack(material["name"]):
+                            if material["name"].endswith("-legendary"):
+                                self.log(f"{indent}📜 Material '{material['name']}' is legendary. Diving deeper.", Fore.BLUE)
+                                missing = search_missing_items(material["name"], crafting_data, depth + 1)
+                                if missing:
+                                    all_available = False
+                            else:
+                                missing = search_missing_items(material["name"], crafting_data, depth + 1)
+                                if missing:
+                                    all_available = False
+                    return item_name if all_available else None
+
+                self.log(f"{indent}🚫 No recipe or entry found for '{item_name}'.", Fore.RED)
+                return None
+
+        def craft_or_upgrade_item(item_name):
+            """Attempts to craft or upgrade an item, including legendary items."""
+            while True:
+                if item_name == None:
                     break
 
-                upgrade_prices = self.get_upgrade_prices()
-                required_items = self.craft(info=False)
-                required_counts = {item["iconName"]: 0 for item in required_items}
-
-                for item in items:
-                    if item["iconName"] in required_counts:
-                        required_counts[item["iconName"]] += 1
-
-                for item in items:
-                    if item["iconName"] in required_counts:
-                        needed_count = sum(
-                            1
-                            for req_item in required_items
-                            if req_item["iconName"] == item["iconName"]
+                if item_name.endswith("-legendary"):
+                    post_response = requests.post(
+                        f"{self.BASE_URL}craft/LEGENDARY_ITEMS/{item_name}",
+                        headers=headers,
+                    )
+                else:
+                    if self.level_item_craft > 0:
+                        post_response = requests.post(
+                            f"{self.BASE_URL}craft/{self.type_craft}/{item_name}/upgrade",
+                            headers=headers,
                         )
-
-                        if required_counts[item["iconName"]] <= needed_count:
-                            self.log(
-                                f"✅ Item '{item['iconName']}' is needed for crafting. Skipping burn or upgrade.",
-                                Fore.GREEN,
-                            )
-                            continue
-
-                        excess_count = required_counts[item["iconName"]] - needed_count
-
-                        if excess_count > 0:
-                            if item["level"] < 8:
-                                self.log(
-                                    f"🔧 Item '{item['iconName']}' will be upgraded to level 8 due to excess count.",
-                                    Fore.CYAN,
-                                )
-                                self.upgrade_to_level_8(
-                                    item, headers, upgrade_url, upgrade_prices
-                                )
-
-                            self.log(
-                                f"❌ Item '{item['iconName']}' will be burned due to excess count.",
-                                Fore.YELLOW,
-                            )
-                            self.burn(id=item["id"], name=item["iconName"])
-                            required_counts[item["iconName"]] -= 1
-
                     else:
-                        self.log(
-                            f"⚠️ Item '{item['iconName']}' is not needed for crafting.",
-                            Fore.MAGENTA,
+                        post_response = requests.post(
+                            f"{self.BASE_URL}craft/{self.type_craft}/{item_name}",
+                            headers=headers,
                         )
 
-                        if item["level"] < 8:
-                            self.log(
-                                f"🔧 Item '{item['iconName']}' is not needed. Upgrading to level 8.",
-                                Fore.CYAN,
-                            )
-                            self.upgrade_to_level_8(
-                                item, headers, upgrade_url, upgrade_prices
-                            )
+                if post_response.status_code == 200:
+                    self.log(f"🎉 Successfully processed '{item_name}'.", Fore.GREEN)
+                    break
+                elif post_response.status_code == 400:
+                    error_code = post_response.json().get("errorCode", "Unknown Error")
+                    self.log(f"❌ Processing failed for '{item_name}' with message: {error_code}. Retrying...", Fore.RED)
+                    time.sleep(3)
+                else:
+                    post_response.raise_for_status()
 
-                        self.log(
-                            f"❌ Item '{item['iconName']}' is not needed. Burning the item.",
-                            Fore.YELLOW,
-                        )
-                        self.burn(id=item["id"], name=item["iconName"])
+        try:
+            response = requests.get(req_url, headers=headers)
+            response.raise_for_status()
+            data = response.json()
 
-                all_items_available = all(
-                    required_counts.get(req_item["iconName"], 0)
-                    >= sum(
-                        1
-                        for item in required_items
-                        if item["iconName"] == req_item["iconName"]
-                    )
-                    for req_item in required_items
-                )
+            if not data or "result" not in data:
+                raise ValueError("Data 'result' not found in the response.")
 
-                if all_items_available:
-                    self.log(
-                        "🎉 All required items for crafting are available. Upgrading items to level 8...",
-                        Fore.BLUE,
-                    )
+            items = data.get("result", [])
+            crafting_data = self.craft(info=False)  # Get crafting recipes
 
-                    for upgrade_item in items:
-                        if (
-                            upgrade_item["iconName"] in required_counts
-                            and upgrade_item["level"] < 8
-                        ):
-                            self.upgrade_to_level_8(
-                                upgrade_item, headers, upgrade_url, upgrade_prices
-                            )
+            protected_items = set()
 
-                    while True:
-                        if self.level_item_craft > 0:
-                            post_response = requests.post(
-                                f"{self.BASE_URL}craft/{self.type_craft}/{self.name_craft}/upgrade",
-                                headers=headers,
-                            )
-                            if post_response.status_code == 200:
-                                self.log(
-                                    f"🎉 Successfully upgrade {self.name_craft}.",
-                                    Fore.GREEN,
-                                )
-                                break
-                            elif post_response.status_code == 400:
-                                error_code = post_response.json().get(
-                                    "errorCode", "Unknown Error"
-                                )
-                                self.log(
-                                    f"❌ Crafting {self.name_craft} failed with message: {error_code}. Retrying...",
-                                    Fore.RED,
-                                )
-                                time.sleep(3)
-                            else:
-                                post_response.raise_for_status()
-                        else:
-                            post_response = requests.post(
-                                f"{self.BASE_URL}craft/{self.type_craft}/{self.name_craft}",
-                                headers=headers,
-                            )
-                            if post_response.status_code == 200:
-                                self.log(
-                                    f"🎉 Successfully crafted {self.name_craft}.",
-                                    Fore.GREEN,
-                                )
-                                break
-                            elif post_response.status_code == 400:
-                                error_code = post_response.json().get(
-                                    "errorCode", "Unknown Error"
-                                )
-                                self.log(
-                                    f"❌ Crafting {self.name_craft} failed with message: {error_code}. Retrying...",
-                                    Fore.RED,
-                                )
-                                time.sleep(3)
-                            else:
-                                post_response.raise_for_status()
-                        return
+            # Traverse all required items for crafting
+            for craft_item in crafting_data:
+                missing_item = search_missing_items(craft_item["name"], crafting_data)
+                if missing_item:
+                    self.log(f"⚠️ Missing item: '{missing_item}'. Attempting to craft.", Fore.YELLOW)
 
-                response = requests.get(req_url, headers=headers)
-                response.raise_for_status()
-                data = response.json()
-                items = [
-                    {
-                        "id": item.get("id"),
-                        "iconName": item.get("iconName"),
-                        "level": item.get("level"),
-                        "type": item.get("type"),
-                    }
-                    for item in data.get("result", [])
-                ]
+                    # Ensure materials are upgraded to level 8 before crafting
+                    self.upgrade_to_level_8(missing_item, headers, upgrade_url, upgrade_prices)
 
-            except requests.exceptions.RequestException as e:
-                self.log(f"❌ Request failed: {e}", Fore.RED)
-                break
+                    craft_or_upgrade_item(missing_item)
 
-            except ValueError as e:
-                self.log(f"⚠️ Data error: {e}", Fore.RED)
-                break
+            # Process legendary items for crafting if necessary
+            for item in crafting_data:
+                if item["name"].endswith("-legendary"):
+                    self.log(f"⚒️ Processing legendary item: '{item['name']}'.", Fore.CYAN)
+                    missing_item = search_missing_items(item["name"], crafting_data)
+                    if missing_item:
+                        self.log(f"⚠️ Missing material for legendary item: '{missing_item}'. Attempting to craft.", Fore.YELLOW)
 
-            except Exception as e:
-                self.log(f"❌ Upgrade | Unexpected error: {e}", Fore.RED)
-                break
+                        # Ensure materials are upgraded to level 8 before crafting
+                        self.upgrade_to_level_8(missing_item, headers, upgrade_url, upgrade_prices)
 
-            time.sleep(5)
+                        craft_or_upgrade_item(missing_item)
 
-        self.log("🎉 Upgrade process completed.", Fore.GREEN)
+            # Mark all items in the backpack as protected
+            for item in items:
+                protected_items.add(item["iconName"])
+
+            # Burn unrelated items
+            self.burn_unrelated_items(items, crafting_data, protected_items)
+
+            self.log("🎉 Upgrade process completed.", Fore.GREEN)
+
+        except requests.exceptions.RequestException as e:
+            self.log(f"❌ Request failed: {e}", Fore.RED)
+
+        except ValueError as e:
+            self.log(f"⚠️ Data error: {e}", Fore.RED)
+
+        except Exception as e:
+            self.log(f"❌ Upgrade | Unexpected error: {e}", Fore.RED)
+
+    def burn_unrelated_items(self, items, crafting_data, protected_items):
+        """
+        Burns items that are not part of any crafting recipe or are not protected.
+        """
+        crafting_names = {recipe["name"] for recipe in crafting_data}
+        for item in items:
+            if item["iconName"] not in crafting_names and item["iconName"] not in protected_items:
+                self.log(f"🔥 Burning unrelated item '{item['iconName']}'.", Fore.YELLOW)
+                self.burn(id=item["id"], name=item["iconName"])
 
     def upgrade_to_level_8(self, item, headers, upgrade_url, upgrade_prices):
+        """
+        Upgrade a single item to level 8 if it is not already at level 8.
+        """
         while item["level"] < 8:
             level_prices = upgrade_prices.get(str(item["level"] + 1))
             if not level_prices:
@@ -858,74 +1043,156 @@ class coinhunter:
     def map(self):
         """
         Manage the flow to search for materials, validate locations, and start farming.
+        Prioritize digging into sub-materials if legendary items are missing.
         """
-        graph, items = self.build_graph(self.MAP)
+        try:
+            # Build graph and item list from MAP
+            graph, items = self.build_graph(self.MAP)
+            if not graph or not items:
+                self.log("❌ Failed to build graph or item list from map data.", Fore.RED)
+                return
 
-        craft_data = self.craft(info=True)
-        if not craft_data:
-            self.log(
-                "❌ Crafting data is invalid or empty. Please check the input.",
-                Fore.RED,
-            )
-            return
-
-        item_counts = {}
-        for item in craft_data:
-            name = item["iconName"]
-            item_counts[name] = item_counts.get(name, 0) + 1
-
-        required_items = [
-            {"name": name, "quantity": quantity}
-            for name, quantity in item_counts.items()
-        ]
-        self.log(f"📝 Items required: {required_items}", Fore.YELLOW)
-
-        missing_items = []
-        for required_item in required_items:
-            item_name = required_item["name"]
-            required_quantity = required_item["quantity"]
-
-            if not self.check_backpack(item_name, required_quantity):
+            # Retrieve crafting data
+            craft_data = self.craft(info=False)
+            if not craft_data:
                 self.log(
-                    f"⚠️ Item '{item_name}' is insufficient ({required_quantity} required).",
+                    "❌ Crafting data is invalid or empty. Please check the input.",
                     Fore.RED,
                 )
-                missing_items.append(required_item)
-            else:
+                return
+
+            # Count the required items
+            item_counts = {}
+            for item in craft_data:
+                if "name" in item and item["name"]:  # Validate key
+                    name = item["name"]
+                    item_counts[name] = item_counts.get(name, 0) + 1
+                else:
+                    self.log(f"⚠️ Missing or invalid 'name' in item: {item}", Fore.YELLOW)
+
+            required_items = [
+                {"iconName": name, "quantity": quantity}
+                for name, quantity in item_counts.items()
+            ]
+            self.log(f"📝 Items required: {required_items}", Fore.YELLOW)
+
+            # Check for missing items in the backpack
+            missing_items = []
+            for required_item in required_items:
+                item_name = required_item["iconName"]
+                required_quantity = required_item["quantity"]
+
+                # Check item availability
+                if not self.check_backpack(item_name, required_quantity):
+                    self.log(
+                        f"⚠️ Item '{item_name}' is insufficient ({required_quantity} required).",
+                        Fore.RED,
+                    )
+                    missing_items.append(required_item)
+                else:
+                    self.log(
+                        f"✅ Item '{item_name}' is available in sufficient quantity.",
+                        Fore.GREEN,
+                    )
+
+            if not missing_items:
                 self.log(
-                    f"✅ Item '{item_name}' is available in sufficient quantity.",
+                    "🎉 All required items are already available in the backpack.",
                     Fore.GREEN,
                 )
+                return
 
-        if not missing_items:
-            self.log(
-                "🎉 All required items are already available in the backpack.",
-                Fore.GREEN,
-            )
-            return
+            # Process missing materials recursively
+            def search_missing_items(item_name):
+                """
+                Traverse items down to their base materials, prioritizing legendary items.
+                If all materials are non-legendary and unavailable in the backpack, immediately return the first missing item.
+                """
+                def process_item(current_item, depth=1):
+                    indent = "  " * depth
+                    self.log(f"{indent}🔍 Checking item '{current_item}' (Depth: {depth})", Fore.MAGENTA)
 
-        for missing_item in missing_items:
-            item_name = missing_item["name"]
-            required_quantity = missing_item["quantity"]
+                    # Base case: Check if the item is available in the backpack
+                    if self.check_backpack(current_item):
+                        self.log(f"{indent}✅ Item '{current_item}' is already in the backpack.", Fore.CYAN)
+                        return None  # All materials are available, proceed to the next item
 
-            best_location, best_path, best_chance = (
-                self.find_best_map_for_item_with_graph(
-                    graph, items, self.location, item_name, required_quantity
-                )
-            )
+                    # If the item is legendary, process its materials
+                    if current_item.endswith("-legendary"):
+                        legendary_item = next((item for item in self.LEGENDARY_ITEMS_LIST if item["alias"] == current_item), None)
+                        if legendary_item:
+                            self.log(f"{indent}📜 Found legendary item '{current_item}' in LEGENDARY_ITEMS_LIST. Checking its materials.", Fore.GREEN)
+                            for material in legendary_item["items"]:
+                                material_name = material["iconName"]
+                                material_type = material["type"]
 
-            if best_location:
-                self.log(
-                    f"📍 Best location found: '{best_location}' with {best_chance:.2f}% chance for item '{item_name}'. Path: {best_path}",
-                    Fore.GREEN,
-                )
-                next_location = best_path[1] if len(best_path) > 1 else best_location
-                self.start_farming(next_location)
-            else:
-                self.log(
-                    f"🚫 No suitable location found for item '{item_name}'. Please check the map or item availability.",
-                    Fore.RED,
-                )
+                                self.log(f"{indent}  🔍 Checking legendary material '{material_name}' (type: {material_type})", Fore.YELLOW)
+                                
+                                # Process legendary materials first
+                                missing = process_item(material_name if material_type != "legendary" else material_name + "-legendary", depth + 1)
+                                if missing:
+                                    return missing  # Return immediately if any non-legendary material is missing
+                            return None  # All materials for this legendary item are processed
+                        else:
+                            self.log(f"{indent}🚫 No entry found for legendary item '{current_item}' in LEGENDARY_ITEMS_LIST.", Fore.RED)
+                            return current_item  # Treat the item as missing if not found in the list
+
+                    # Search for the recipe of non-legendary items
+                    recipe = next((r for r in craft_data if r["name"] == current_item), None)
+                    if recipe and "materials" in recipe:
+                        self.log(f"{indent}📜 Found recipe for '{current_item}'. Checking its materials.", Fore.GREEN)
+                        for material in recipe["materials"]:
+                            material_name = material["name"]
+                            material_type = material["type"]
+
+                            self.log(f"{indent}  🔍 Checking material '{material_name}' (type: {material_type})", Fore.YELLOW)
+                            missing = process_item(material_name if material_type != "legendary" else material_name + "-legendary", depth + 1)
+                            if missing:
+                                return missing  # Return immediately if any non-legendary material is missing
+                        return None  # All materials for this non-legendary item are processed
+                    else:
+                        self.log(f"{indent}🚫 No recipe found for '{current_item}'.", Fore.RED)
+                        return current_item  # Treat the item as missing if no recipe is found
+
+                # Start from the main item
+                missing_item = process_item(item_name)
+                if missing_item:
+                    self.log(f"⚠️ Missing item: '{missing_item}'. Returning to prevent unnecessary stacking.", Fore.RED)
+                    return missing_item  # Return the first missing item
+                self.log(f"✅ All materials for '{item_name}' checked successfully.", Fore.GREEN)
+                return None  # All materials are found
+
+            # Handle all missing items
+            for missing_item in missing_items:
+                item_name = missing_item["iconName"]
+
+                # Search for the item recursively
+                missing_material = search_missing_items(item_name)
+
+                if missing_material:
+                    # Find the best location for the missing item
+                    best_location, best_path, best_chance = (
+                        self.find_best_map_for_item_with_graph(
+                            graph, items, self.location, missing_material, 1
+                        )
+                    )
+
+                    if best_location and best_path:
+                        self.log(
+                            f"📍 Best location found: '{best_location}' with {best_chance:.2f}% chance for item '{missing_material}'. Path: {best_path}",
+                            Fore.GREEN,
+                        )
+                        # Start farming at the next location
+                        next_location = best_path[1] if len(best_path) > 1 else best_location
+                        self.start_farming(next_location)
+                    else:
+                        self.log(
+                            f"🚫 No suitable location found for item '{missing_material}'. Please check the map or item availability.",
+                            Fore.RED,
+                        )
+
+        except Exception as e:
+            self.log(f"❗ Error in map process: {str(e)}", Fore.RED)
 
     def start_farming(self, location):
         """
@@ -1010,125 +1277,158 @@ class coinhunter:
             self.log(f"❗ Request error while checking the backpack: {e}", Fore.RED)
             return False
 
-    def craft(self, info=True):
-        """
-        Manage crafting flow based on slot capacity and prioritize backpack.
-        """
-        weapons_url = f"{self.BASE_URL}craft/WEAPONS"
-        craft_url = f"{self.BASE_URL}craft/CRAFT_ITEMS"
-        legendary_url = f"{self.BASE_URL}craft/LEGENDARY_ITEMS"
+    def get_backpack(self):
+        backpack_url = f"{self.BASE_URL}backpack"
         headers = {**self.HEADERS, "telegram-data": self.token}
 
         try:
-            weapons_data = requests.get(weapons_url, headers=headers).json()
-            craft_data = requests.get(craft_url, headers=headers).json()
-            legendary_data = requests.get(legendary_url, headers=headers).json()
-
-            if (
-                not weapons_data.get("ok")
-                or not craft_data.get("ok")
-                or not legendary_data.get("ok")
-            ):
-                raise ValueError("❌ Failed to fetch data from APIs.")
-
-            weapons = weapons_data["result"]
-            crafts = craft_data["result"]
-            legendary_map = {item["name"]: item for item in legendary_data["result"]}
-
-            # Initialize slot capacity
-            slot_capacity = 3
-            for item in crafts:
-                if item["name"] == "backpack" and item["isUserOwn"]:
-                    slot_capacity += item.get("reduce", 0)
-
-            # Check if backpack is owned
-            for item in crafts:
-                if item["name"] == "backpack" and not item["isUserOwn"]:
-                    self.name_craft = item["name"]
-                    self.type_craft = "CRAFT_ITEMS"
-                    self.level_item_craft = item["level"]
-                    if info:
-                        self.log(
-                            f"⚠️ Crafting 'backpack' to increase slot capacity.",
-                            Fore.YELLOW,
-                        )
-                    crafting_items = item["items"]
-                    return self.craft_items(crafting_items, legendary_map)
-
-            # Prioritize crafting items within slot capacity
-            for item in crafts:
-                if item["level"] < 8 and len(item["items"]) <= slot_capacity:
-                    self.name_craft = item["name"]
-                    self.type_craft = "CRAFT_ITEMS"
-                    self.level_item_craft = item["level"]
-                    if info:
-                        self.log(
-                            f"⚠️ Crafting '{item['name']}' to level up (current level: {item['level']}).",
-                            Fore.CYAN,
-                        )
-                    crafting_items = item["items"]
-                    return self.craft_items(crafting_items, legendary_map)
-
-            # Check fishing_rod crafting
-            for weapon in weapons:
-                if weapon["name"] == "fishing_rod" and not weapon["isUserOwn"]:
-                    self.name_craft = weapon["name"]
-                    self.type_craft = "WEAPONS"
-                    self.level_item_craft = weapon["level"]
-                    if len(weapon["items"]) <= slot_capacity:
-                        if info:
-                            self.log(
-                                f"⚠️ Crafting 'fishing_rod' (slots required: {len(weapon['items'])}).",
-                                Fore.CYAN,
-                            )
-                        crafting_items = weapon["items"]
-                        return self.craft_items(crafting_items, legendary_map)
-
-            # Check vaporizer crafting
-            for weapon in weapons:
-                if weapon["name"] == "vaporizer" and not weapon["isUserOwn"]:
-                    self.name_craft = weapon["name"]
-                    self.type_craft = "WEAPONS"
-                    self.level_item_craft = weapon["level"]
-                    if len(weapon["items"]) <= slot_capacity:
-                        if info:
-                            self.log(
-                                f"⚠️ Crafting 'vaporizer' (slots required: {len(weapon['items'])}).",
-                                Fore.CYAN,
-                            )
-                        crafting_items = weapon["items"]
-                        return self.craft_items(crafting_items, legendary_map)
-
-            if info:
-                self.log(
-                    "🎉 All items are crafted or slots are insufficient.", Fore.GREEN
-                )
-
+            backpack_data = requests.get(backpack_url, headers=headers).json()
+            if not backpack_data.get("ok"):
+                raise ValueError("❌ Gagal mengambil data dari API Backpack.")
+            return backpack_data
         except requests.RequestException as e:
-            self.log(f"❌ API request failed: {e}", Fore.RED)
+            self.log(f"❌ Gagal request API: {e}", Fore.RED)
             raise
         except ValueError as e:
-            self.log(f"❌ Data validation error: {e}", Fore.RED)
+            self.log(f"❌ Error validasi data: {e}", Fore.RED)
             raise
         except Exception as e:
-            self.log(f"❌ Unexpected error during crafting: {e}", Fore.RED)
+            self.log(f"❌ Error tak terduga saat mengambil data backpack: {e}", Fore.RED)
 
-    def craft_items(self, items, legendary_map):
+    def craft(self, info=True):
         """
-        Handle crafting of items, checking for legendary item requirements.
+        Initiates the crafting process by fetching recipes from the API
+        and printing detailed recipes, including legendary items if required.
         """
-        for material in items:
-            icon_name = material["iconName"]
-            if icon_name in legendary_map:
-                legendary_recipe = legendary_map[icon_name]
-                self.name_craft = legendary_recipe["name"]
-                self.type_craft = "LEGENDARY_ITEMS"
-                self.log(
-                    f"🔧 Crafting material '{icon_name}' from LEGENDARY_ITEMS: '{legendary_recipe['name']}'.",
-                    Fore.CYAN,
-                )
-                return legendary_recipe["items"]
-        return items
+        def get_crafting_data():
+            """
+            Fetch crafting data from the API.
+            """
+            weapons_url = f"{self.BASE_URL}craft/WEAPONS"
+            craft_url = f"{self.BASE_URL}craft/CRAFT_ITEMS"
+            headers = {**self.HEADERS, "telegram-data": self.token}
+
+            try:
+                # Fetch data from the API
+                weapons_data = requests.get(weapons_url, headers=headers).json()
+                craft_data = requests.get(craft_url, headers=headers).json()
+
+                if not weapons_data.get("ok") or not craft_data.get("ok"):
+                    raise ValueError("❌ Failed to retrieve data from the API. Check API response.")
+
+                return weapons_data["result"], craft_data["result"]
+
+            except requests.RequestException as e:
+                self.log(f"❌ API request failed: {e}", Fore.RED)
+                raise
+            except ValueError as e:
+                self.log(f"❌ Data validation error: {e}", Fore.RED)
+                raise
+            except Exception as e:
+                self.log(f"❌ Unexpected error while fetching crafting data: {e}", Fore.RED)
+                raise
+
+        def process_legendary_item(item_name, materials, parent_item=None):
+            """
+            Process legendary materials and add them to the material list while maintaining context.
+            """
+            base_name = item_name.replace("-legendary", "")
+            
+            # Retrieve legendary item based on context
+            legendary_item = next(
+                (item for item in self.LEGENDARY_ITEMS_LIST if item["alias"] == f"{item_name}-legendary"),
+                None
+            )
+            if legendary_item:
+                sub_materials = []
+                for mat in legendary_item["items"]:
+                    # If the material is legendary, process it further
+                    if mat["type"] == "legendary":
+                        process_legendary_item(mat["iconName"], sub_materials, item_name)
+                    else:
+                        # Add regular material to sub-materials
+                        sub_materials.append({
+                            "name": mat["iconName"],
+                            "type": mat["type"],
+                            "parent": item_name
+                        })
+
+                # Add the legendary item after all its sub-materials are processed
+                materials.append({
+                    "name": f"{base_name}-legendary",
+                    "type": "legendary",
+                    "materials": sub_materials,
+                    "parent": parent_item
+                })
+
+        def get_full_recipe(item_name, crafting_list):
+            """
+            Retrieve the full recipe for a specific item, including legendary materials.
+            """
+            item = next((i for i in crafting_list if i["name"] == item_name), None)
+            if not item:
+                self.log(f"❌ Item '{item_name}' not found.", Fore.RED)
+                return []
+
+            materials = []
+            for mat in item["items"]:
+                if mat["type"] == "legendary":  # Process legendary items
+                    process_legendary_item(mat["iconName"], materials, item_name)
+                else:
+                    # Ensure only unprocessed materials are added
+                    if mat["iconName"] not in [m["name"] for m in materials]:
+                        materials.append({"name": mat["iconName"], "type": mat["type"], "parent": item_name})
+
+            return materials
+
+        def log_and_return_recipe(item_name, crafting_list):
+            """
+            Retrieve and log the full recipe.
+            """
+            recipe = get_full_recipe(item_name, crafting_list)
+            
+            # Format JSON neatly and structurally
+            recipe_json = json.dumps(recipe, indent=4)
+            
+            if info:
+                self.log(f"📝 Full recipe for item '{item_name}':\n{recipe_json}", Fore.GREEN)
+
+            return recipe
+
+        # Fetch crafting data
+        weapons, crafts = get_crafting_data()
+
+        # Prioritize crafting items
+        for item in crafts:
+            if item["name"] == "backpack" and not item["isUserOwn"]:
+                if info:
+                    self.log(f"⚠️ Crafting 'backpack' to increase slot capacity.", Fore.YELLOW)
+                self.type_craft = "CRAFT_ITEMS"
+                self.level_item_craft = item['level']
+                self.name_craft = item['name']
+                return log_and_return_recipe(item["name"], crafts)
+
+            if item["level"] < 8:
+                if info:
+                    self.log(f"⚠️ Crafting '{item['name']}' to increase its level.", Fore.CYAN)
+                self.type_craft = "CRAFT_ITEMS"
+                self.level_item_craft = item['level']
+                self.name_craft = item['name']
+                return log_and_return_recipe(item["name"], crafts)
+
+        # Check weapon crafting
+        for weapon in weapons:
+            if weapon["name"] in ["fishing_rod", "vaporizer"] and not weapon["isUserOwn"]:
+                if info:
+                    self.log(f"⚠️ Crafting '{weapon['name']}' for weapon requirements.", Fore.CYAN)
+                self.type_craft = "WEAPONS"
+                self.level_item_craft = item['level']
+                self.name_craft = item['name']
+                return log_and_return_recipe(weapon["name"], weapons)
+
+        if info:
+            self.log("🎉 All items are already crafted or no new crafting is required.", Fore.GREEN)
+        return []
 
     def info(self) -> None:
         req_url = f"{self.BASE_URL}user"
@@ -1334,9 +1634,7 @@ class coinhunter:
                         try:
                             info_data = info_res.json()
                             if info_data.get("ok") and "result" in info_data:
-                                craft_items = self.craft(info=False)
-
-                                prizes = info_data["result"]["info"]["prizes"]
+                                craft_items = self.craft(info=False)  # Get craft items
 
                                 if craft_items:
                                     # Consolidate required items by name
@@ -1345,18 +1643,14 @@ class coinhunter:
                                         name = item["iconName"]
                                         item_counts[name] = item_counts.get(name, 0) + 1
 
+                                    prizes = info_data["result"]["info"]["prizes"]
                                     for prize in prizes:
                                         icon_name = prize["iconName"]
                                         chance = prize["chance"]
-
-                                        required_quantity = item_counts.get(
-                                            icon_name, 0
-                                        )
+                                        required_quantity = item_counts.get(icon_name, 0)
 
                                         if required_quantity > 0:
-                                            if self.check_backpack(
-                                                icon_name, required_quantity
-                                            ):
+                                            if self.check_backpack(icon_name, required_quantity):
                                                 self.log(
                                                     f"✅ Item '{icon_name}' is sufficient in backpack ({required_quantity} required).",
                                                     Fore.GREEN,
@@ -1372,98 +1666,50 @@ class coinhunter:
                                                         f"✅ Item '{icon_name}' has a high chance ({chance}%), claiming chest.",
                                                         Fore.GREEN,
                                                     )
-                                                    claim_url = (
-                                                        f"{self.BASE_URL}chest/open"
-                                                    )
-                                                    claim_res = requests.post(
-                                                        claim_url, headers=headers
-                                                    )
+                                                    claim_url = f"{self.BASE_URL}chest/open"
+                                                    claim_res = requests.post(claim_url, headers=headers)
                                                     if claim_res.status_code == 200:
                                                         try:
-                                                            check_data = (
-                                                                claim_res.json()
-                                                            )
-                                                            if (
-                                                                check_data.get("ok")
-                                                                and "result"
-                                                                in check_data
-                                                            ):
-                                                                item_name = check_data[
-                                                                    "result"
-                                                                ].get(
-                                                                    "item",
-                                                                    "Unknown item",
-                                                                )
-                                                                self.log(
-                                                                    f"🎁 Chest opened successfully! Item obtained: {item_name}",
-                                                                    Fore.GREEN,
-                                                                )
+                                                            check_data = claim_res.json()
+                                                            if check_data.get("ok") and "result" in check_data:
+                                                                item_name = check_data["result"].get("item", "Unknown item")
+                                                                self.log(f"🎁 Chest opened successfully! Item obtained: {item_name}", Fore.GREEN)
                                                             else:
-                                                                self.log(
-                                                                    f"⚠️ Invalid data or chest not found. Please check server response.",
-                                                                    Fore.RED,
-                                                                )
+                                                                self.log("⚠️ Invalid data or chest not found. Please check server response.", Fore.RED)
                                                         except ValueError:
-                                                            self.log(
-                                                                f"❌ Failed to process JSON response from server.",
-                                                                Fore.RED,
-                                                            )
+                                                            self.log("❌ Failed to process JSON response from server.", Fore.RED)
                                                     else:
                                                         try:
-                                                            error_message = (
-                                                                claim_res.json().get(
-                                                                    "errorCode",
-                                                                    "Unknown error",
-                                                                )
-                                                            )
+                                                            error_message = claim_res.json().get("errorCode", "Unknown error")
                                                         except ValueError:
                                                             error_message = "Server response could not be processed."
-
-                                                        self.log(
-                                                            f"❌ Failed to claim chest. HTTP Status: {claim_res.status_code}, Message: {error_message}",
-                                                            Fore.RED,
-                                                        )
+                                                        self.log(f"❌ Failed to claim chest. HTTP Status: {claim_res.status_code}, Message: {error_message}", Fore.RED)
                                                     break
                                         else:
-                                            self.log(
-                                                f"⚠️ Item '{icon_name}' not required for crafting.",
-                                                Fore.YELLOW,
-                                            )
+                                            self.log(f"⚠️ Item '{icon_name}' not required for crafting.", Fore.YELLOW)
                                 else:
-                                    self.log(
-                                        "❌ Failed to fetch crafting data or data is empty.",
-                                        Fore.RED,
-                                    )
+                                    self.log("❌ Failed to fetch crafting data or data is empty.", Fore.RED)
+                            else:
+                                self.log("❌ Failed to fetch chest data or data is empty.", Fore.RED)
                         except ValueError:
-                            self.log(
-                                f"❌ Failed to process JSON response from server.",
-                                Fore.RED,
-                            )
+                            self.log("❌ Failed to process JSON response from server.", Fore.RED)
                     else:
-                        self.log(
-                            "❌ Failed to fetch crafting data or data is empty.",
-                            Fore.RED,
-                        )
+                        self.log("❌ Failed to fetch chest data.", Fore.RED)
                 else:
                     self.log(f"❌ Incorrect combination: {code_icons}", Fore.RED)
-
                     for i, res in enumerate(result):
                         if not res:
                             current_code[i] = random.choice(possible_directions)
 
             except requests.exceptions.RequestException as e:
-                self.log(
-                    f"⚠️ Chest already unlocked, attempting to open chest.", Fore.RED
-                )
+                self.log("⚠️ Chest already unlocked, attempting to open chest.", Fore.RED)
                 info_url = f"{self.BASE_URL}chest"
                 info_res = requests.get(info_url, headers=headers)
                 if info_res.status_code == 200:
                     try:
                         info_data = info_res.json()
                         if info_data.get("ok") and "result" in info_data:
-                            craft_items = self.craft(info=False)
-
-                            prizes = info_data["result"]["info"]["prizes"]
+                            craft_items = self.craft(info=False)  # Get craft items
 
                             if craft_items:
                                 # Consolidate required items by name
@@ -1472,16 +1718,14 @@ class coinhunter:
                                     name = item["iconName"]
                                     item_counts[name] = item_counts.get(name, 0) + 1
 
+                                prizes = info_data["result"]["info"]["prizes"]
                                 for prize in prizes:
                                     icon_name = prize["iconName"]
                                     chance = prize["chance"]
-
                                     required_quantity = item_counts.get(icon_name, 0)
 
                                     if required_quantity > 0:
-                                        if self.check_backpack(
-                                            icon_name, required_quantity
-                                        ):
+                                        if self.check_backpack(icon_name, required_quantity):
                                             self.log(
                                                 f"✅ Item '{icon_name}' is sufficient in backpack ({required_quantity} required).",
                                                 Fore.GREEN,
@@ -1498,69 +1742,32 @@ class coinhunter:
                                                     Fore.GREEN,
                                                 )
                                                 claim_url = f"{self.BASE_URL}chest/open"
-                                                claim_res = requests.post(
-                                                    claim_url, headers=headers
-                                                )
+                                                claim_res = requests.post(claim_url, headers=headers)
                                                 if claim_res.status_code == 200:
                                                     try:
                                                         check_data = claim_res.json()
-                                                        if (
-                                                            check_data.get("ok")
-                                                            and "result" in check_data
-                                                        ):
-                                                            item_name = check_data[
-                                                                "result"
-                                                            ].get(
-                                                                "item", "Unknown item"
-                                                            )
-                                                            self.log(
-                                                                f"🎁 Chest opened successfully! Item obtained: {item_name}",
-                                                                Fore.GREEN,
-                                                            )
+                                                        if check_data.get("ok") and "result" in check_data:
+                                                            item_name = check_data["result"].get("item", "Unknown item")
+                                                            self.log(f"🎁 Chest opened successfully! Item obtained: {item_name}", Fore.GREEN)
                                                         else:
-                                                            self.log(
-                                                                f"⚠️ Invalid data or chest not found. Please check server response.",
-                                                                Fore.RED,
-                                                            )
+                                                            self.log("⚠️ Invalid data or chest not found. Please check server response.", Fore.RED)
                                                     except ValueError:
-                                                        self.log(
-                                                            f"❌ Failed to process JSON response from server.",
-                                                            Fore.RED,
-                                                        )
+                                                        self.log("❌ Failed to process JSON response from server.", Fore.RED)
                                                 else:
                                                     try:
-                                                        error_message = (
-                                                            claim_res.json().get(
-                                                                "errorCode",
-                                                                "Unknown error",
-                                                            )
-                                                        )
+                                                        error_message = claim_res.json().get("errorCode", "Unknown error")
                                                     except ValueError:
                                                         error_message = "Server response could not be processed."
-
-                                                    self.log(
-                                                        f"❌ Failed to claim chest. HTTP Status: {claim_res.status_code}, Message: {error_message}",
-                                                        Fore.RED,
-                                                    )
+                                                    self.log(f"❌ Failed to claim chest. HTTP Status: {claim_res.status_code}, Message: {error_message}", Fore.RED)
                                                 break
                                     else:
-                                        self.log(
-                                            f"⚠️ Item '{icon_name}' not required for crafting.",
-                                            Fore.YELLOW,
-                                        )
+                                        self.log(f"⚠️ Item '{icon_name}' not required for crafting.", Fore.YELLOW)
                             else:
-                                self.log(
-                                    "❌ Failed to fetch crafting data or data is empty.",
-                                    Fore.RED,
-                                )
+                                self.log("❌ Failed to fetch crafting data or data is empty.", Fore.RED)
                     except ValueError:
-                        self.log(
-                            f"❌ Failed to process JSON response from server.", Fore.RED
-                        )
+                        self.log("❌ Failed to process JSON response from server.", Fore.RED)
                 else:
-                    self.log(
-                        "❌ Failed to fetch crafting data or data is empty.", Fore.RED
-                    )
+                    self.log("❌ Failed to fetch chest data.", Fore.RED)
                 break
             except ValueError as e:
                 self.log(f"⚠️ Data error: {e}", Fore.RED)
