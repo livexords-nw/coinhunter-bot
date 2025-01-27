@@ -23,17 +23,21 @@ With this bot, you can save time while maximizing your results without manual in
 
 ---
 
-## 🌟 **Version Beta v1.7.9**
+## 🌟 **Version Beta v1.8.0**
 
 ### **Updates in This Version**:
 
-1. **New Features**:
-   - **Enhanced Crafting System**: Added a more complex crafting system, now including **legendary items** with unique recipes and materials.
+1. **System Improvements**:
+   - **Enhanced Upgrade System**: Major improvements to the upgrade system, providing better performance and reliability compared to the previous version.
+   
+2. **Crafting Overhaul**:
+   - **Diverse Crafting Workflow**: The crafting system has been restructured to support a wider variety of crafting items, moving away from a single-item focus. This provides more flexibility and depth for users.
 
 ### **Known Issues**:
 
-- **Chest Feature Disabled**: The chest feature has been temporarily disabled as it is not yet integrated into the system.
-- **Auto-Upgrade Feature**: Apologies for any bugs with the auto-upgrade feature. We're working on resolving the issues, but it may not function as expected at this time.
+- **Chest Feature Disabled**: The chest feature remains temporarily disabled as integration into the system is still in progress.
+- **Auto-Upgrade Feature**: While improvements have been made, minor issues may persist. We're actively working to ensure full functionality in future updates.
+
 
 ---
 

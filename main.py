@@ -573,18 +573,18 @@ class coinhunter:
 
             # If the item is legendary, process its materials
             if item_name.endswith("-legendary"):
-                legendary_item = next((item for item in crafting_data if item["name"] == item_name), None)
+                legendary_item = next((item for item in crafting_data if item.get("name") == item_name), None)
                 if not legendary_item:
                     # Search in LEGENDARY_ITEMS_LIST
-                    legendary_item = next((item for item in self.LEGENDARY_ITEMS_LIST if item["alias"] == item_name), None)
+                    legendary_item = next((item for item in self.LEGENDARY_ITEMS_LIST if item.get("alias") == item_name), None)
 
                 if legendary_item:
                     self.log(f"{indent}📜 Found legendary item '{item_name}'. Checking its materials.", Fore.GREEN)
-                    materials_key = "materials" if "materials" in legendary_item else "items"
+                    materials_key = "materials" if legendary_item.get("materials") else "items"
                     all_available = True
-                    for material in legendary_item[materials_key]:
-                        if not self.check_backpack(material["name"]):
-                            missing = search_missing_items(material["name"], crafting_data, depth + 1)
+                    for material in legendary_item.get(materials_key, []):
+                        if not self.check_backpack(material.get("name")):
+                            missing = search_missing_items(material.get("name"), crafting_data, depth + 1)
                             if missing:
                                 all_available = False
                     return item_name if all_available else None
@@ -592,46 +592,30 @@ class coinhunter:
                     self.log(f"{indent}🚫 No recipe found for legendary item '{item_name}'.", Fore.RED)
                     return None
 
-            # Check non-legendary items
-            recipe = next((r for r in crafting_data if r["name"] == item_name), None)
-            if recipe and "materials" in recipe:
+            # Check non-legendary items directly in the backpack
+            if self.check_backpack(item_name):
+                self.log(f"{indent}✅ Non-legendary item '{item_name}' found in the backpack.", Fore.CYAN)
+                return None
+
+            # If item is not found in the backpack and has a recipe, process it
+            recipe = next((r for r in crafting_data if r.get("name") == item_name), None)
+            if recipe and recipe.get("materials"):
                 self.log(f"{indent}📜 Found recipe for '{item_name}'. Checking its materials.", Fore.GREEN)
                 all_available = True
-                for material in recipe["materials"]:
-                    # Check if material is in backpack
-                    if not self.check_backpack(material["name"]):
-                        if material["name"].endswith("-legendary"):
-                            self.log(f"{indent}📜 Material '{material['name']}' is legendary. Diving deeper.", Fore.BLUE)
-                            missing = search_missing_items(material["name"], crafting_data, depth + 1)
+                for material in recipe.get("materials", []):
+                    if not self.check_backpack(material.get("name")):
+                        if material.get("name", "").endswith("-legendary"):
+                            self.log(f"{indent}📜 Material '{material.get('name')}' is legendary. Diving deeper.", Fore.BLUE)
+                            missing = search_missing_items(material.get("name"), crafting_data, depth + 1)
                             if missing:
                                 all_available = False
                         else:
-                            missing = search_missing_items(material["name"], crafting_data, depth + 1)
-                            if missing:
-                                all_available = False
+                            self.log(f"{indent}🚫 Missing non-legendary material '{material.get('name')}' in backpack.", Fore.RED)
+                            all_available = False
                 return item_name if all_available else None
-            else:
-                self.log(f"{indent}🚫 No recipe found for '{item_name}', checking LEGENDARY_ITEMS_LIST.", Fore.YELLOW)
-                # Search in LEGENDARY_ITEMS_LIST
-                legendary_item = next((item for item in self.LEGENDARY_ITEMS_LIST if item["alias"] == item_name), None)
-                if legendary_item:
-                    self.log(f"{indent}📜 Found '{item_name}' in LEGENDARY_ITEMS_LIST. Checking its materials.", Fore.GREEN)
-                    all_available = True
-                    for material in legendary_item["items"]:
-                        if not self.check_backpack(material["name"]):
-                            if material["name"].endswith("-legendary"):
-                                self.log(f"{indent}📜 Material '{material['name']}' is legendary. Diving deeper.", Fore.BLUE)
-                                missing = search_missing_items(material["name"], crafting_data, depth + 1)
-                                if missing:
-                                    all_available = False
-                            else:
-                                missing = search_missing_items(material["name"], crafting_data, depth + 1)
-                                if missing:
-                                    all_available = False
-                    return item_name if all_available else None
 
-                self.log(f"{indent}🚫 No recipe or entry found for '{item_name}'.", Fore.RED)
-                return None
+            self.log(f"{indent}🚫 No recipe or entry found for '{item_name}'.", Fore.RED)
+            return None
 
         def craft_or_upgrade_item(item_name):
             """Attempts to craft or upgrade an item, including legendary items."""
@@ -647,12 +631,12 @@ class coinhunter:
                 else:
                     if self.level_item_craft > 0:
                         post_response = requests.post(
-                            f"{self.BASE_URL}craft/{self.type_craft}/{item_name}/upgrade",
+                            f"{self.BASE_URL}craft/{self.type_craft}/{self.name_craft}/upgrade",
                             headers=headers,
                         )
                     else:
                         post_response = requests.post(
-                            f"{self.BASE_URL}craft/{self.type_craft}/{item_name}",
+                            f"{self.BASE_URL}craft/{self.type_craft}/{self.name_craft}",
                             headers=headers,
                         )
 
@@ -666,6 +650,46 @@ class coinhunter:
                 else:
                     post_response.raise_for_status()
 
+        # Fungsi untuk mendapatkan bahan yang diperlukan untuk item
+        def get_required_materials(item_name, crafting_data, backpack_items, legendary_items_list, depth=1, visited=None):
+            visited = visited or set()
+            if item_name in visited:
+                return set()  # Hindari infinite loop jika ada siklus crafting.
+
+            visited.add(item_name)
+            materials = set()
+
+            # Cek apakah item_name adalah bahan crafting (dengan resep)
+            recipe = next((r for r in crafting_data if r.get("name") == item_name), None)
+            if recipe:
+                # Jika item legendary ada di backpack dan juga ada dalam resep, lindungi item tersebut
+                if recipe["type"] == "legendary" and item_name in backpack_items:
+                    materials.add(item_name)
+                else:
+                    for material in recipe.get("materials", []):
+                        material_name = material.get("name")
+                        materials.add(material_name)  # Tambahkan bahan ke daftar
+                        
+                        # Jika material memiliki sufiks '-legendary', bongkar item legendary
+                        if material_name.endswith("-legendary"):
+                            # Cari data dalam LEGENDARY_ITEMS_LIST berdasarkan alias
+                            legendary_item = next((item for item in legendary_items_list if item["alias"] == material_name), None)
+                            if legendary_item:
+                                # Tambahkan semua bahan dari legendary item ke dalam materials
+                                for item in legendary_item["items"]:
+                                    materials.add(item["iconName"])  # Tambahkan bahan dari legendary item ke daftar bahan
+                            else:
+                                # Rekursi jika bahan belum ada di backpack
+                                if material_name not in backpack_items:
+                                    materials.update(get_required_materials(material_name, crafting_data, backpack_items, legendary_items_list, depth + 1, visited))
+                        else:
+                            # Jika bahan non-legendary ada di backpack dan diperlukan dalam resep, lindungi bahan tersebut
+                            if material_name in backpack_items:
+                                materials.add(material_name)
+
+            return materials
+
+
         try:
             response = requests.get(req_url, headers=headers)
             response.raise_for_status()
@@ -677,11 +701,70 @@ class coinhunter:
             items = data.get("result", [])
             crafting_data = self.craft(info=False)  # Get crafting recipes
 
-            protected_items = set()
+            # Ambil daftar item di backpack
+            backpack_items = {item.get("iconName") for item in items if item.get("iconName")}
 
-            # Traverse all required items for crafting
+            # Hitung semua bahan yang diperlukan secara rekursif
+            all_required_items = set()
+            for recipe in crafting_data:
+                all_required_items.add(recipe["name"])  # Nama item utama juga perlu dimasukkan
+                all_required_items.update(get_required_materials(recipe["name"], crafting_data, backpack_items, self.LEGENDARY_ITEMS_LIST))
+
+            # Hitung jumlah item yang dimiliki berdasarkan nama (iconName)
+            item_counts = {item.get("iconName"): item.get("quantity", 0) for item in items if item.get("iconName")}
+
+            for item in items:
+                item_name = item.get("iconName")
+                if not item_name:
+                    continue
+
+                item_level = item.get("level", 1)  # Default level to 1 if not specified.
+
+                # Hitung jumlah yang dibutuhkan untuk crafting (termasuk bahan rekursif)
+                required_quantity = sum(
+                    1
+                    for recipe in crafting_data
+                    if recipe.get("materials")
+                    for material in recipe.get("materials", [])
+                    if material.get("name") == item_name
+                )
+                owned_quantity = item_counts.get(item_name, 0)
+
+                self.log(f"Owned: {owned_quantity}")
+                self.log(f"All required items: {all_required_items}")
+
+                # Jika item legendary ada di backpack dan ada di resep, tidak perlu diupgrade atau dibakar
+                if item_name in all_required_items and item_name.endswith("-legendary") and item_name in backpack_items:
+                    self.log(f"✔️ Legendary item '{item_name}' is protected from burning/upgrading.")
+                    continue  # Skip burning or upgrading for protected items
+
+                # Jangan upgrade item yang dibutuhkan untuk crafting (termasuk bahan-bahan non-legendary yang ada di backpack)
+                if item_name not in all_required_items and item_level < 8:
+                    self.upgrade_to_level_8(item, headers, upgrade_url, upgrade_prices)
+
+                # Bakar item jika tidak termasuk dalam resep (meskipun sudah ada di backpack)
+                if item_name not in all_required_items:
+                    self.log(
+                        f"🔥 Burning unnecessary item '{item_name}' (Owned: {owned_quantity}, Not in crafting recipes).",
+                        Fore.YELLOW,
+                    )
+                    for _ in range(owned_quantity):
+                        self.burn(id=item.get("id"), name=item_name)
+                    continue
+
+                # Bakar item jika jumlahnya melebihi kebutuhan crafting
+                if owned_quantity > required_quantity:
+                    excess_quantity = max(0, owned_quantity - required_quantity)
+                    self.log(
+                        f"🔥 Burning {excess_quantity} excess of '{item_name}' (Owned: {owned_quantity}, Required: {required_quantity}).",
+                        Fore.YELLOW,
+                    )
+                    for _ in range(excess_quantity):
+                        self.burn(id=item.get("id"), name=item_name)
+
+            # Melanjutkan proses upgrade dan crafting
             for craft_item in crafting_data:
-                missing_item = search_missing_items(craft_item["name"], crafting_data)
+                missing_item = search_missing_items(craft_item.get("name"), crafting_data)
                 if missing_item:
                     self.log(f"⚠️ Missing item: '{missing_item}'. Attempting to craft.", Fore.YELLOW)
 
@@ -690,11 +773,11 @@ class coinhunter:
 
                     craft_or_upgrade_item(missing_item)
 
-            # Process legendary items for crafting if necessary
+            # Proses legendary items jika diperlukan
             for item in crafting_data:
-                if item["name"].endswith("-legendary"):
-                    self.log(f"⚒️ Processing legendary item: '{item['name']}'.", Fore.CYAN)
-                    missing_item = search_missing_items(item["name"], crafting_data)
+                if item.get("name", "").endswith("-legendary"):
+                    self.log(f"⚒️ Processing legendary item: '{item.get('name')}'.", Fore.CYAN)
+                    missing_item = search_missing_items(item.get("name"), crafting_data)
                     if missing_item:
                         self.log(f"⚠️ Missing material for legendary item: '{missing_item}'. Attempting to craft.", Fore.YELLOW)
 
@@ -703,13 +786,7 @@ class coinhunter:
 
                         craft_or_upgrade_item(missing_item)
 
-            # Mark all items in the backpack as protected
-            for item in items:
-                protected_items.add(item["iconName"])
-
-            # Burn unrelated items
-            self.burn_unrelated_items(items, crafting_data, protected_items)
-
+            # Proses selesai
             self.log("🎉 Upgrade process completed.", Fore.GREEN)
 
         except requests.exceptions.RequestException as e:
@@ -721,33 +798,28 @@ class coinhunter:
         except Exception as e:
             self.log(f"❌ Upgrade | Unexpected error: {e}", Fore.RED)
 
-    def burn_unrelated_items(self, items, crafting_data, protected_items):
-        """
-        Burns items that are not part of any crafting recipe or are not protected.
-        """
-        crafting_names = {recipe["name"] for recipe in crafting_data}
-        for item in items:
-            if item["iconName"] not in crafting_names and item["iconName"] not in protected_items:
-                self.log(f"🔥 Burning unrelated item '{item['iconName']}'.", Fore.YELLOW)
-                self.burn(id=item["id"], name=item["iconName"])
-
     def upgrade_to_level_8(self, item, headers, upgrade_url, upgrade_prices):
         """
         Upgrade a single item to level 8 if it is not already at level 8.
         """
+        self.log(f"🔧 Upgrading item: {item}")
         while item["level"] < 8:
-            level_prices = upgrade_prices.get(str(item["level"] + 1))
+            next_level = item["level"] + 1
+
+            # Cek data harga upgrade untuk level berikutnya
+            level_prices = upgrade_prices.get(str(next_level))  # Pastikan level sebagai string
             if not level_prices:
                 self.log(
-                    f"⚠️ No upgrade price data available for {item['iconName']} to level {item['level'] + 1}.",
+                    f"⚠️ No upgrade price data available for {item['iconName']} to level {next_level}.",
                     Fore.YELLOW,
                 )
                 break
 
+            # Cek harga berdasarkan tipe item (konversi ke huruf kecil)
             type_data = level_prices.get(item["type"].lower())
             if not type_data:
                 self.log(
-                    f"⚠️ No price information for item type {item['type']} for level {item['level'] + 1}.",
+                    f"⚠️ No price information for item type '{item['type']}' for level {next_level}.",
                     Fore.YELLOW,
                 )
                 break
@@ -755,7 +827,7 @@ class coinhunter:
             upgrade_cost = type_data["price"]
             if self.coin < upgrade_cost:
                 self.log(
-                    f"❌ Insufficient balance to upgrade {item['iconName']} to level {item['level'] + 1}.",
+                    f"❌ Insufficient balance to upgrade {item['iconName']} to level {next_level}. Cost: {upgrade_cost}, Coins: {self.coin}.",
                     Fore.RED,
                 )
                 break
@@ -767,8 +839,9 @@ class coinhunter:
                 upgrade_data = upgrade_response.json()
                 if upgrade_data.get("ok"):
                     item["level"] = upgrade_data["result"]["item"]["level"]
+                    self.coin = upgrade_data["result"]["user"]["coins"]
                     self.log(
-                        f"🎉 Successfully upgraded {item['iconName']} to level {item['level']}.",
+                        f"🎉 Successfully upgraded {item['iconName']} to level {item['level']}. Remaining coins: {self.coin}.",
                         Fore.GREEN,
                     )
                 else:
@@ -1300,6 +1373,7 @@ class coinhunter:
         Initiates the crafting process by fetching recipes from the API
         and printing detailed recipes, including legendary items if required.
         """
+        backpackinfo_url = f"{self.BASE_URL}user/config"
         def get_crafting_data():
             """
             Fetch crafting data from the API.
@@ -1398,33 +1472,57 @@ class coinhunter:
         # Fetch crafting data
         weapons, crafts = get_crafting_data()
 
+        headers = {**self.HEADERS, "telegram-data": self.token}
+
+        try:
+            response = requests.get(backpackinfo_url, headers=headers)
+            response.raise_for_status()
+            max_backpack_size = response.json().get("result", {}).get("maxBackpackSize", 0)
+        except Exception as e:
+            self.log(f"❌ Error fetching backpack info: {e}", Fore.RED)
+            max_backpack_size = 0
+
+        def can_craft(items):
+            return len(items) <= max_backpack_size
+
+        # Check weapon crafting first
+        for weapon in weapons:
+            if weapon["name"] in ["fishing_rod", "vaporizer"] and not weapon["isUserOwn"]:
+                weapon_level = weapon["level"] if weapon["name"] != "fishing_rod" else min(weapon["level"], 3)
+                if info:
+                    self.log(f"⚠️ Crafting '{weapon['name']}' for weapon requirements.", Fore.CYAN)
+                
+                if can_craft(weapon["items"]):
+                    self.type_craft = "WEAPONS"
+                    self.level_item_craft = weapon_level - 1 if not weapon["isUserOwn"] else weapon_level
+                    self.name_craft = weapon["name"]
+                    return log_and_return_recipe(weapon["name"], weapons)
+                else:
+                    self.log(f"❌ Not enough backpack space for '{weapon['name']}'!", Fore.RED)
+
         # Prioritize crafting items
         for item in crafts:
-            if item["name"] == "backpack" and not item["isUserOwn"]:
-                if info:
-                    self.log(f"⚠️ Crafting 'backpack' to increase slot capacity.", Fore.YELLOW)
-                self.type_craft = "CRAFT_ITEMS"
-                self.level_item_craft = item['level']
-                self.name_craft = item['name']
-                return log_and_return_recipe(item["name"], crafts)
-
             if item["level"] < 8:
                 if info:
                     self.log(f"⚠️ Crafting '{item['name']}' to increase its level.", Fore.CYAN)
-                self.type_craft = "CRAFT_ITEMS"
-                self.level_item_craft = item['level']
-                self.name_craft = item['name']
-                return log_and_return_recipe(item["name"], crafts)
+                if can_craft(item.get("items", [])):
+                    self.type_craft = "CRAFT_ITEMS"
+                    self.level_item_craft = item['level'] - 1 if not weapon["isUserOwn"] else item['level']
+                    self.name_craft = item['name']
+                    return log_and_return_recipe(item["name"], crafts)
+                else:
+                    self.log(f"❌ Not enough backpack space for '{item['name']}'!", Fore.RED)
 
-        # Check weapon crafting
-        for weapon in weapons:
-            if weapon["name"] in ["fishing_rod", "vaporizer"] and not weapon["isUserOwn"]:
+            if item["name"] == "backpack" and not item["isUserOwn"]:
                 if info:
-                    self.log(f"⚠️ Crafting '{weapon['name']}' for weapon requirements.", Fore.CYAN)
-                self.type_craft = "WEAPONS"
-                self.level_item_craft = item['level']
-                self.name_craft = item['name']
-                return log_and_return_recipe(weapon["name"], weapons)
+                    self.log(f"⚠️ Crafting 'backpack' to increase slot capacity.", Fore.YELLOW)
+                if can_craft(item.get("items", [])):
+                    self.type_craft = "CRAFT_ITEMS"
+                    self.level_item_craft = item['level'] - 1 if not weapon["isUserOwn"] else item['level']
+                    self.name_craft = item['name']
+                    return log_and_return_recipe(item["name"], crafts)
+                else:
+                    self.log(f"❌ Not enough backpack space for 'backpack'!", Fore.RED)
 
         if info:
             self.log("🎉 All items are already crafted or no new crafting is required.", Fore.GREEN)
@@ -1819,6 +1917,7 @@ if __name__ == "__main__":
         chunter.log(f"👤 [ACCOUNT] Processing account {index + 1}/{max_index}: {display_account}", Fore.YELLOW)
 
         chunter.login(index)
+        # chunter.log(str(chunter.craft()))
 
         # Task execution
         chunter.log("🛠️ Starting task execution...")
