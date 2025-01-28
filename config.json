@@ -5,7 +5,7 @@
   "upgrade": true,
   "mission": true,
   "tasks": true,
-  "chest": false,
+  "chest": true,
   "reff": true,
   "delay_account_switch": 10,
   "delay_loop": 3000

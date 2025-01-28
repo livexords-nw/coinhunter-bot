@@ -23,21 +23,22 @@ With this bot, you can save time while maximizing your results without manual in
 
 ---
 
-## 🌟 **Version Beta v1.8.0**
+## 🌟 **Version 1.9.0**  
 
-### **Updates in This Version**:
+### **Updates in This Version**:  
 
-1. **System Improvements**:
-   - **Enhanced Upgrade System**: Major improvements to the upgrade system, providing better performance and reliability compared to the previous version.
+1. **System Improvements**:  
+   - **Burning System Overhaul**: Significant improvements to the burning system for better efficiency and functionality.
    
-2. **Crafting Overhaul**:
-   - **Diverse Crafting Workflow**: The crafting system has been restructured to support a wider variety of crafting items, moving away from a single-item focus. This provides more flexibility and depth for users.
+2. **Auto Chest System**:  
+   - **Enhanced Auto Chest**: The auto chest feature is now active, but it is operating without a filter. This allows more flexibility in handling chests.
 
-### **Known Issues**:
+3. **System Workflow**:  
+   - **Task and Upgrade System**: Now, upgrades are integrated at the end of each task, streamlining the process.
 
-- **Chest Feature Disabled**: The chest feature remains temporarily disabled as integration into the system is still in progress.
-- **Auto-Upgrade Feature**: While improvements have been made, minor issues may persist. We're actively working to ensure full functionality in future updates.
+### **Known Issues**:  
 
+- **Crafting System**: There might be some bugs in the crafting system. As the developer, I haven't been able to test it fully due to the unavailability of the required materials.
 
 ---
 

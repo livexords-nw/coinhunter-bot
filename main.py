@@ -650,40 +650,40 @@ class coinhunter:
                 else:
                     post_response.raise_for_status()
 
-        # Fungsi untuk mendapatkan bahan yang diperlukan untuk item
+        # Function to get the required materials for an item
         def get_required_materials(item_name, crafting_data, backpack_items, legendary_items_list, depth=1, visited=None):
             visited = visited or set()
             if item_name in visited:
-                return set()  # Hindari infinite loop jika ada siklus crafting.
+                return set()  # Avoid infinite loops if there is a crafting cycle.
 
             visited.add(item_name)
             materials = set()
 
-            # Cek apakah item_name adalah bahan crafting (dengan resep)
+            # Check if the item_name is a craftable item (with a recipe)
             recipe = next((r for r in crafting_data if r.get("name") == item_name), None)
             if recipe:
-                # Jika item legendary ada di backpack dan juga ada dalam resep, lindungi item tersebut
+                # If a legendary item exists in the backpack and is also in the recipe, protect the item
                 if recipe["type"] == "legendary" and item_name in backpack_items:
                     materials.add(item_name)
                 else:
                     for material in recipe.get("materials", []):
                         material_name = material.get("name")
-                        materials.add(material_name)  # Tambahkan bahan ke daftar
+                        materials.add(material_name)  # Add material to the set
                         
-                        # Jika material memiliki sufiks '-legendary', bongkar item legendary
+                         # If the material has the suffix '-legendary', break down the legendary item
                         if material_name.endswith("-legendary"):
-                            # Cari data dalam LEGENDARY_ITEMS_LIST berdasarkan alias
+                            # Look for the data in LEGENDARY_ITEMS_LIST based on the alias
                             legendary_item = next((item for item in legendary_items_list if item["alias"] == material_name), None)
                             if legendary_item:
-                                # Tambahkan semua bahan dari legendary item ke dalam materials
+                                # Add all materials from the legendary item to the materials set
                                 for item in legendary_item["items"]:
-                                    materials.add(item["iconName"])  # Tambahkan bahan dari legendary item ke daftar bahan
+                                    materials.add(item["iconName"])   # Add materials from the legendary item to the list
                             else:
-                                # Rekursi jika bahan belum ada di backpack
+                                 # Recursively check for materials not present in the backpack
                                 if material_name not in backpack_items:
                                     materials.update(get_required_materials(material_name, crafting_data, backpack_items, legendary_items_list, depth + 1, visited))
                         else:
-                            # Jika bahan non-legendary ada di backpack dan diperlukan dalam resep, lindungi bahan tersebut
+                            # If the non-legendary material exists in the backpack and is required in the recipe, protect the material
                             if material_name in backpack_items:
                                 materials.add(material_name)
 
@@ -701,16 +701,16 @@ class coinhunter:
             items = data.get("result", [])
             crafting_data = self.craft(info=False)  # Get crafting recipes
 
-            # Ambil daftar item di backpack
+            # Get the list of items in the backpack
             backpack_items = {item.get("iconName") for item in items if item.get("iconName")}
 
-            # Hitung semua bahan yang diperlukan secara rekursif
+            # Calculate all required materials recursively
             all_required_items = set()
             for recipe in crafting_data:
-                all_required_items.add(recipe["name"])  # Nama item utama juga perlu dimasukkan
+                all_required_items.add(recipe["name"])  # Add the main item name to the set
                 all_required_items.update(get_required_materials(recipe["name"], crafting_data, backpack_items, self.LEGENDARY_ITEMS_LIST))
 
-            # Hitung jumlah item yang dimiliki berdasarkan nama (iconName)
+            # Count the items owned based on their names (iconName)
             item_counts = {item.get("iconName"): item.get("quantity", 0) for item in items if item.get("iconName")}
 
             for item in items:
@@ -720,7 +720,7 @@ class coinhunter:
 
                 item_level = item.get("level", 1)  # Default level to 1 if not specified.
 
-                # Hitung jumlah yang dibutuhkan untuk crafting (termasuk bahan rekursif)
+                # Calculate the quantity needed for crafting (including recursive materials)
                 required_quantity = sum(
                     1
                     for recipe in crafting_data
@@ -730,39 +730,35 @@ class coinhunter:
                 )
                 owned_quantity = item_counts.get(item_name, 0)
 
-                self.log(f"Owned: {owned_quantity}")
-                self.log(f"All required items: {all_required_items}")
-
-                # Jika item legendary ada di backpack dan ada di resep, tidak perlu diupgrade atau dibakar
+                # Protect legendary items in the backpack if they are in the recipe
                 if item_name in all_required_items and item_name.endswith("-legendary") and item_name in backpack_items:
                     self.log(f"✔️ Legendary item '{item_name}' is protected from burning/upgrading.")
                     continue  # Skip burning or upgrading for protected items
 
-                # Jangan upgrade item yang dibutuhkan untuk crafting (termasuk bahan-bahan non-legendary yang ada di backpack)
+                # Skip upgrading items required for crafting (including non-legendary materials in the backpack)
                 if item_name not in all_required_items and item_level < 8:
                     self.upgrade_to_level_8(item, headers, upgrade_url, upgrade_prices)
 
-                # Bakar item jika tidak termasuk dalam resep (meskipun sudah ada di backpack)
+                # Burn items if they are not in any crafting recipe (even if they exist in the backpack)
                 if item_name not in all_required_items:
                     self.log(
                         f"🔥 Burning unnecessary item '{item_name}' (Owned: {owned_quantity}, Not in crafting recipes).",
                         Fore.YELLOW,
                     )
-                    for _ in range(owned_quantity):
-                        self.burn(id=item.get("id"), name=item_name)
-                    continue
+                    
+                    self.burn(id=item.get("id"), name=item_name)
+                    
 
-                # Bakar item jika jumlahnya melebihi kebutuhan crafting
+                # Burn excess items if their quantity exceeds the crafting requirement
                 if owned_quantity > required_quantity:
                     excess_quantity = max(0, owned_quantity - required_quantity)
                     self.log(
                         f"🔥 Burning {excess_quantity} excess of '{item_name}' (Owned: {owned_quantity}, Required: {required_quantity}).",
                         Fore.YELLOW,
                     )
-                    for _ in range(excess_quantity):
-                        self.burn(id=item.get("id"), name=item_name)
+                    self.burn(id=item.get("id"), name=item_name)
 
-            # Melanjutkan proses upgrade dan crafting
+            # Continue with the upgrade and crafting process
             for craft_item in crafting_data:
                 missing_item = search_missing_items(craft_item.get("name"), crafting_data)
                 if missing_item:
@@ -773,7 +769,7 @@ class coinhunter:
 
                     craft_or_upgrade_item(missing_item)
 
-            # Proses legendary items jika diperlukan
+            # Process legendary items if needed
             for item in crafting_data:
                 if item.get("name", "").endswith("-legendary"):
                     self.log(f"⚒️ Processing legendary item: '{item.get('name')}'.", Fore.CYAN)
@@ -786,7 +782,7 @@ class coinhunter:
 
                         craft_or_upgrade_item(missing_item)
 
-            # Proses selesai
+            # Process completed
             self.log("🎉 Upgrade process completed.", Fore.GREEN)
 
         except requests.exceptions.RequestException as e:
@@ -852,11 +848,11 @@ class coinhunter:
                     break
             elif upgrade_response.status_code == 400:
                 self.log(
-                    f"⚠️ Upgrade failed for {item['iconName']} (Bad Request). Status: {upgrade_response.status_code}.",
+                    f"⚠️ Upgrade failed for {item['iconName']}",
                     Fore.RED,
                 )
-                self.log("🔧 Please wait before trying again...", Fore.YELLOW)
-                time.sleep(5)
+                self.coin = upgrade_data["result"]["user"]["coins"]
+                self.log("🔧 trying again...", Fore.YELLOW)
             else:
                 self.log(
                     f"❌ Upgrade failed for {item['iconName']}. Status: {upgrade_response.status_code}.",
@@ -864,7 +860,7 @@ class coinhunter:
                 )
                 break
 
-            time.sleep(3)
+            time.sleep(1)
 
     def burn(self, id: str, name: str) -> None:
         req_url = f"{self.BASE_URL}backpack/burn"
@@ -875,7 +871,7 @@ class coinhunter:
             response = requests.post(req_url, headers=headers, json=payload)
             response.raise_for_status()
 
-            result = response.json().get("ok")
+            result = response.json()
             if result:
                 self.log(
                     f"🎉 Successfully upgraded hunter using item: {name}", Fore.GREEN
@@ -1258,6 +1254,7 @@ class coinhunter:
                         # Start farming at the next location
                         next_location = best_path[1] if len(best_path) > 1 else best_location
                         self.start_farming(next_location)
+                        break
                     else:
                         self.log(
                             f"🚫 No suitable location found for item '{missing_material}'. Please check the map or item availability.",
@@ -1730,65 +1727,25 @@ class coinhunter:
                     info_res = requests.get(info_url, headers=headers)
                     if info_res.status_code == 200:
                         try:
-                            info_data = info_res.json()
-                            if info_data.get("ok") and "result" in info_data:
-                                craft_items = self.craft(info=False)  # Get craft items
-
-                                if craft_items:
-                                    # Consolidate required items by name
-                                    item_counts = {}
-                                    for item in craft_items:
-                                        name = item["iconName"]
-                                        item_counts[name] = item_counts.get(name, 0) + 1
-
-                                    prizes = info_data["result"]["info"]["prizes"]
-                                    for prize in prizes:
-                                        icon_name = prize["iconName"]
-                                        chance = prize["chance"]
-                                        required_quantity = item_counts.get(icon_name, 0)
-
-                                        if required_quantity > 0:
-                                            if self.check_backpack(icon_name, required_quantity):
-                                                self.log(
-                                                    f"✅ Item '{icon_name}' is sufficient in backpack ({required_quantity} required).",
-                                                    Fore.GREEN,
-                                                )
-                                            else:
-                                                if chance < 50:
-                                                    self.log(
-                                                        f"⚠️ Item '{icon_name}' has a low chance ({chance}%).",
-                                                        Fore.RED,
-                                                    )
-                                                else:
-                                                    self.log(
-                                                        f"✅ Item '{icon_name}' has a high chance ({chance}%), claiming chest.",
-                                                        Fore.GREEN,
-                                                    )
-                                                    claim_url = f"{self.BASE_URL}chest/open"
-                                                    claim_res = requests.post(claim_url, headers=headers)
-                                                    if claim_res.status_code == 200:
-                                                        try:
-                                                            check_data = claim_res.json()
-                                                            if check_data.get("ok") and "result" in check_data:
-                                                                item_name = check_data["result"].get("item", "Unknown item")
-                                                                self.log(f"🎁 Chest opened successfully! Item obtained: {item_name}", Fore.GREEN)
-                                                            else:
-                                                                self.log("⚠️ Invalid data or chest not found. Please check server response.", Fore.RED)
-                                                        except ValueError:
-                                                            self.log("❌ Failed to process JSON response from server.", Fore.RED)
-                                                    else:
-                                                        try:
-                                                            error_message = claim_res.json().get("errorCode", "Unknown error")
-                                                        except ValueError:
-                                                            error_message = "Server response could not be processed."
-                                                        self.log(f"❌ Failed to claim chest. HTTP Status: {claim_res.status_code}, Message: {error_message}", Fore.RED)
-                                                    break
-                                        else:
-                                            self.log(f"⚠️ Item '{icon_name}' not required for crafting.", Fore.YELLOW)
-                                else:
-                                    self.log("❌ Failed to fetch crafting data or data is empty.", Fore.RED)
+                            claim_url = f"{self.BASE_URL}chest/open"
+                            claim_res = requests.post(claim_url, headers=headers)
+                            if claim_res.status_code == 200:
+                                try:
+                                    check_data = claim_res.json()
+                                    if check_data.get("ok") and "result" in check_data:
+                                        item_name = check_data["result"].get("item", "Unknown item")
+                                        self.log(f"🎁 Chest opened successfully! Item obtained: {item_name}", Fore.GREEN)
+                                    else:
+                                        self.log("⚠️ Invalid data or chest not found. Please check server response.", Fore.RED)
+                                except ValueError:
+                                    self.log("❌ Failed to process JSON response from server.", Fore.RED)
                             else:
-                                self.log("❌ Failed to fetch chest data or data is empty.", Fore.RED)
+                                try:
+                                    error_message = claim_res.json().get("errorCode", "Unknown error")
+                                except ValueError:
+                                    error_message = "Server response could not be processed."
+                                self.log(f"❌ Failed to claim chest. HTTP Status: {claim_res.status_code}, Message: {error_message}", Fore.RED)
+                            break
                         except ValueError:
                             self.log("❌ Failed to process JSON response from server.", Fore.RED)
                     else:
@@ -1804,66 +1761,25 @@ class coinhunter:
                 info_url = f"{self.BASE_URL}chest"
                 info_res = requests.get(info_url, headers=headers)
                 if info_res.status_code == 200:
-                    try:
-                        info_data = info_res.json()
-                        if info_data.get("ok") and "result" in info_data:
-                            craft_items = self.craft(info=False)  # Get craft items
-
-                            if craft_items:
-                                # Consolidate required items by name
-                                item_counts = {}
-                                for item in craft_items:
-                                    name = item["iconName"]
-                                    item_counts[name] = item_counts.get(name, 0) + 1
-
-                                prizes = info_data["result"]["info"]["prizes"]
-                                for prize in prizes:
-                                    icon_name = prize["iconName"]
-                                    chance = prize["chance"]
-                                    required_quantity = item_counts.get(icon_name, 0)
-
-                                    if required_quantity > 0:
-                                        if self.check_backpack(icon_name, required_quantity):
-                                            self.log(
-                                                f"✅ Item '{icon_name}' is sufficient in backpack ({required_quantity} required).",
-                                                Fore.GREEN,
-                                            )
-                                        else:
-                                            if chance < 50:
-                                                self.log(
-                                                    f"⚠️ Item '{icon_name}' has a low chance ({chance}%).",
-                                                    Fore.RED,
-                                                )
-                                            else:
-                                                self.log(
-                                                    f"✅ Item '{icon_name}' has a high chance ({chance}%), claiming chest.",
-                                                    Fore.GREEN,
-                                                )
-                                                claim_url = f"{self.BASE_URL}chest/open"
-                                                claim_res = requests.post(claim_url, headers=headers)
-                                                if claim_res.status_code == 200:
-                                                    try:
-                                                        check_data = claim_res.json()
-                                                        if check_data.get("ok") and "result" in check_data:
-                                                            item_name = check_data["result"].get("item", "Unknown item")
-                                                            self.log(f"🎁 Chest opened successfully! Item obtained: {item_name}", Fore.GREEN)
-                                                        else:
-                                                            self.log("⚠️ Invalid data or chest not found. Please check server response.", Fore.RED)
-                                                    except ValueError:
-                                                        self.log("❌ Failed to process JSON response from server.", Fore.RED)
-                                                else:
-                                                    try:
-                                                        error_message = claim_res.json().get("errorCode", "Unknown error")
-                                                    except ValueError:
-                                                        error_message = "Server response could not be processed."
-                                                    self.log(f"❌ Failed to claim chest. HTTP Status: {claim_res.status_code}, Message: {error_message}", Fore.RED)
-                                                break
-                                    else:
-                                        self.log(f"⚠️ Item '{icon_name}' not required for crafting.", Fore.YELLOW)
+                    claim_url = f"{self.BASE_URL}chest/open"
+                    claim_res = requests.post(claim_url, headers=headers)
+                    if claim_res.status_code == 200:
+                        try:
+                            check_data = claim_res.json()
+                            if check_data.get("ok") and "result" in check_data:
+                                item_name = check_data["result"].get("item", "Unknown item")
+                                self.log(f"🎁 Chest opened successfully! Item obtained: {item_name}", Fore.GREEN)
                             else:
-                                self.log("❌ Failed to fetch crafting data or data is empty.", Fore.RED)
-                    except ValueError:
-                        self.log("❌ Failed to process JSON response from server.", Fore.RED)
+                                self.log("⚠️ Invalid data or chest not found. Please check server response.", Fore.RED)
+                        except ValueError:
+                            self.log("❌ Failed to process JSON response from server.", Fore.RED)
+                    else:
+                        try:
+                            error_message = claim_res.json().get("errorCode", "Unknown error")
+                        except ValueError:
+                            error_message = "Server response could not be processed."
+                        self.log(f"❌ Failed to claim chest. HTTP Status: {claim_res.status_code}, Message: {error_message}", Fore.RED)
+                    break
                 else:
                     self.log("❌ Failed to fetch chest data.", Fore.RED)
                 break
@@ -1917,22 +1833,22 @@ if __name__ == "__main__":
         chunter.log(f"👤 [ACCOUNT] Processing account {index + 1}/{max_index}: {display_account}", Fore.YELLOW)
 
         chunter.login(index)
-        # chunter.log(str(chunter.craft()))
 
         # Task execution
         chunter.log("🛠️ Starting task execution...")
-        tasks = {
-            "daily": "🌞 Daily Task",
-            "upgrade": "🔧 Upgrade Task",
-            "wheel": "🎡 Spin the Wheel",
-            "farm": "🌾 Farming Resources",
-            "mission": "🚀 Mission Progress",
-            "tasks": "📋 General Tasks",
-            "chest": "💼 Chest Collection",
-            "reff": "🤝 Referral Program",
-        }
+        tasks = [
+            ("daily", "🌞 Daily Task"),
+            ("upgrade", "🔧 Upgrade Task - First"),
+            ("wheel", "🎡 Spin the Wheel"),
+            ("farm", "🌾 Farming Resources"),
+            ("mission", "🚀 Mission Progress"),
+            ("tasks", "📋 General Tasks"),
+            ("chest", "💼 Chest Collection"),
+            ("reff", "🤝 Referral Program"),
+            ("upgrade", "🔧 Upgrade Task - Last"),
+        ]
 
-        for task_key, task_name in tasks.items():
+        for task_key, task_name in tasks:
             task_status = config.get(task_key, False)
             chunter.log(
                 f"[CONFIG] {task_name}: {'✅ Enabled' if task_status else '❌ Disabled'}",
