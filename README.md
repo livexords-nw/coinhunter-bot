@@ -23,20 +23,20 @@ With this bot, you can save time while maximizing your results without manual in
 
 ---
 
-## 🌟 **Version 1.9.0**  
+## 🌟 **Version 1.9.0**
 
-### **Updates in This Version**:  
+### **Updates in This Version**:
 
-1. **System Improvements**:  
+1. **System Improvements**:
    - **Burning System Overhaul**: Significant improvements to the burning system for better efficiency and functionality.
-   
-2. **Auto Chest System**:  
+2. **Auto Chest System**:
+
    - **Enhanced Auto Chest**: The auto chest feature is now active, but it is operating without a filter. This allows more flexibility in handling chests.
 
-3. **System Workflow**:  
+3. **System Workflow**:
    - **Task and Upgrade System**: Now, upgrades are integrated at the end of each task, streamlining the process.
 
-### **Known Issues**:  
+### **Known Issues**:
 
 - **Crafting System**: There might be some bugs in the crafting system. As the developer, I haven't been able to test it fully due to the unavailability of the required materials.
 
@@ -52,7 +52,7 @@ With this bot, you can save time while maximizing your results without manual in
 | `mission`              | Automatically complete missions             | `True`      |
 | `upgrade`              | Automatically upgrade item levels           | `True`      |
 | `tasks`                | Automatically complete tasks                | `True`      |
-| `chest`                | Automatically solve chest puzzles and claim | `False`     |
+| `chest`                | Automatically solve chest puzzles and claim | `True`      |
 | `reff`                 | Automatically claim referral points         | `True`      |
 | `delay_account_switch` | Delay before switching accounts             | `10`        |
 | `delay_loop`           | Delay before looping again                  | `3000`      |
